@@ -402,6 +402,7 @@ export const useTtsStudioStore = create<TtsStudioState>((set, get) => {
     },
 
     loadItemIntoEditor: (item) => {
+      const prevModel = get().selectedModelId;
       set({
         title: item.title,
         text: item.input_text,
@@ -410,6 +411,9 @@ export const useTtsStudioStore = create<TtsStudioState>((set, get) => {
         language: item.language === "Auto" ? "Auto" : "English",
         instruct: item.instruct || "",
       });
+      if (item.model_id !== prevModel) {
+        void get().refreshVoices(item.model_id);
+      }
     },
   };
 });

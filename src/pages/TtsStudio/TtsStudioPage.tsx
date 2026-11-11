@@ -358,7 +358,8 @@ export function TtsStudioPage() {
                   <button
                     disabled={isGenerating}
                     onClick={() => {
-                      loadItemIntoEditor(playingItem);
+                      setField("title", playingItem.title);
+                      setField("text", playingItem.input_text);
                       void startGeneration();
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#20202a] border border-[#2e2e3c] text-xs text-[#dcdce6] hover:border-[#d4a373]/50 disabled:opacity-40"
