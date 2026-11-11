@@ -1,12 +1,14 @@
-import { Cpu, HardDrive, Mic2, Shield, Sliders, Trash2 } from "lucide-react";
+import { AudioLines, Cpu, HardDrive, Mic2, Shield, Sliders, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 import { useAppStore } from "../../store/useAppStore";
+import { useTtsStudioStore } from "../../store/useTtsStudioStore";
 import type { StorageStats } from "../../types";
 
 export function SettingsPage() {
   const { settings, models, voices, hardware, updateAppSettings, updateReaderPrefs, refreshBooks, refreshModelsAndVoices, setErrorToast } =
     useAppStore();
+  const { enabled: studioEnabled, setEnabledFlag: setStudioEnabled } = useTtsStudioStore();
 
   const [storage, setStorage] = useState<StorageStats | null>(null);
   const [msg, setMsg] = useState("");
@@ -327,6 +329,31 @@ export function SettingsPage() {
           >
             Delete All Application Data
           </button>
+        </div>
+      </section>
+
+      {/* TEXT TO SPEECH STUDIO FEATURE FLAG */}
+      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AudioLines className="w-4 h-4 text-[#d4a373]" />
+            <div>
+              <div className="text-sm font-semibold text-[#f1f1f4]">Text-to-Speech Studio (Standalone)</div>
+              <p className="text-xs text-[#8d8d9b] mt-0.5">
+                Show Text to Speech in the sidebar to synthesize arbitrary text locally without affecting your EPUB library or audiobook cache.
+              </p>
+            </div>
+          </div>
+          <input
+            type="checkbox"
+            checked={studioEnabled}
+            onChange={(e) => {
+              void setStudioEnabled(e.target.checked).catch((err) =>
+                setErrorToast(err instanceof Error ? err.message : String(err))
+              );
+            }}
+            className="accent-[#d4a373]"
+          />
         </div>
       </section>
     </div>

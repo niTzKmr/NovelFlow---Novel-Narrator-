@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from app.api.audiobook_routes import router as audiobook_router
 from app.api.books_routes import router as books_router
 from app.api.routes import router as core_router
+from app.api.tts_studio_routes import router as tts_studio_router
 from app.core.config import settings
 from app.database.db import get_setting, init_database
 from app.services.audiobook import audiobook_queue
@@ -62,6 +63,7 @@ app.add_middleware(
 app.include_router(core_router)
 app.include_router(books_router)
 app.include_router(audiobook_router)
+app.include_router(tts_studio_router)
 
 
 @app.get("/", include_in_schema=False)

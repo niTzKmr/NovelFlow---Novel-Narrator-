@@ -19,6 +19,7 @@ storage/audio/*
 storage/voices/*
 storage/cache/*
 storage/db/*
+storage/tts_studio/
 !storage/books/.gitkeep
 !storage/audio/.gitkeep
 !storage/voices/.gitkeep

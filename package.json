@@ -12,6 +12,7 @@
     "build:electron": "tsc -p tsconfig.electron.json",
     "build": "npm run build:renderer && npm run build:electron",
     "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:win:exp": "npm run build && electron-builder --win --x64 -c.directories.output=release-experimental -c.productName=NovelFlow-Experimental -c.appId=com.novelflow.experimental -c.win.artifactName=NovelFlow-Experimental-Setup-${version}-${arch}.${ext}",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit"
   },
   "dependencies": {

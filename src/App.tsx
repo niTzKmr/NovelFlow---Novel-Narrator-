@@ -8,15 +8,24 @@ import { HomePage } from "./pages/Home/HomePage";
 import { LibraryPage } from "./pages/Library/LibraryPage";
 import { ReaderPage } from "./pages/Reader/ReaderPage";
 import { SettingsPage } from "./pages/Settings/SettingsPage";
+import { TtsStudioPage } from "./pages/TtsStudio/TtsStudioPage";
 import { VoiceLabPage } from "./pages/VoiceLab/VoiceLabPage";
 import { useAppStore } from "./store/useAppStore";
+import { useTtsStudioStore } from "./store/useTtsStudioStore";
 
 export default function App() {
-  const { page, bootstrap, backendReady, isFullscreen, errorToast, setErrorToast } = useAppStore();
+  const { page, bootstrap, backendReady, isFullscreen, errorToast, setErrorToast, settings } = useAppStore();
+  const { initialized: studioInitialized, initStudio } = useTtsStudioStore();
 
   useEffect(() => {
     bootstrap();
   }, [bootstrap]);
+
+  useEffect(() => {
+    if (backendReady && settings && !studioInitialized) {
+      void initStudio(settings.active_model_id, settings.preferred_voice_id, settings.device_preference);
+    }
+  }, [backendReady, settings, studioInitialized, initStudio]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#0f0f12] text-[#ececef] overflow-hidden">
@@ -55,6 +64,7 @@ export default function App() {
                 {page === "library" && <LibraryPage />}
                 {page === "reader" && <ReaderPage />}
                 {page === "voicelab" && <VoiceLabPage />}
+                {page === "tts" && <TtsStudioPage />}
                 {page === "settings" && <SettingsPage />}
               </motion.div>
             </AnimatePresence>

@@ -1,5 +1,6 @@
-import { BookOpen, Home, Library, Mic2, Settings, ShieldCheck, Cpu } from "lucide-react";
+import { AudioLines, BookOpen, Cpu, Home, Library, Mic2, Settings, ShieldCheck } from "lucide-react";
 import { useAppStore } from "../../store/useAppStore";
+import { useTtsStudioStore } from "../../store/useTtsStudioStore";
 import type { PageId } from "../../types";
 
 const NAV_ITEMS: { id: PageId; label: string; icon: typeof Home }[] = [
@@ -7,13 +8,16 @@ const NAV_ITEMS: { id: PageId; label: string; icon: typeof Home }[] = [
   { id: "library", label: "Library", icon: Library },
   { id: "reader", label: "Reader", icon: BookOpen },
   { id: "voicelab", label: "Voice Lab", icon: Mic2 },
+  { id: "tts", label: "Text to Speech", icon: AudioLines },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const { page, setPage, hardware, settings, activeBook } = useAppStore();
+  const studioEnabled = useTtsStudioStore((s) => s.enabled);
 
   const activeModelShort = settings?.active_model_id?.split("/").pop() || "0.6B-Base";
+  const visibleItems = studioEnabled ? NAV_ITEMS : NAV_ITEMS.filter((i) => i.id !== "tts");
 
   return (
     <aside className="w-60 shrink-0 bg-[#141418] border-r border-[#24242d] flex flex-col justify-between select-none">
@@ -29,7 +33,7 @@ export function Sidebar() {
         </div>
 
         <nav className="px-3 space-y-1">
-          {NAV_ITEMS.map((item) => {
+          {visibleItems.map((item) => {
             const Icon = item.icon;
             const active = page === item.id;
             const disabled = item.id === "reader" && !activeBook;
