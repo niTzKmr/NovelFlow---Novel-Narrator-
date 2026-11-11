@@ -1,0 +1,92 @@
+{
+  "name": "novelflow",
+  "version": "1.0.0",
+  "author": "NovelFlow Contributors",
+  "description": "Free, offline-first AI EPUB reader and local audiobook desktop application powered by Qwen3-TTS.",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev:vite": "vite --port 5173 --strictPort",
+    "dev": "concurrently -k \"npm:dev:vite\" \"npm:dev:electron\"",
+    "dev:electron": "tsc -p tsconfig.electron.json && wait-on http://127.0.0.1:5173 && cross-env NODE_ENV=development ELECTRON_RUN_AS_NODE= electron .",
+    "build:renderer": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build": "npm run build:renderer && npm run build:electron",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit"
+  },
+  "dependencies": {
+    "epubjs": "^0.3.93",
+    "framer-motion": "^12.0.0",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.novelflow.desktop",
+    "productName": "NovelFlow",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/app",
+        "to": "backend/app"
+      },
+      {
+        "from": "backend/requirements.txt",
+        "to": "backend/requirements.txt"
+      },
+      {
+        "from": "models/README.md",
+        "to": "models/README.md"
+      },
+      {
+        "from": "docs/THIRD_PARTY_LICENSES.md",
+        "to": "docs/THIRD_PARTY_LICENSES.md"
+      }
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "dir",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "NovelFlow-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
+

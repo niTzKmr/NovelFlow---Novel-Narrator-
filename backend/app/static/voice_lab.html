@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovelFlow — Standalone Voice Testing Lab</title>
+  <style>
+    :root {
+      --bg: #111114;
+      --surface: #18181d;
+      --surface-2: #202027;
+      --border: #2c2c35;
+      --text: #ececef;
+      --muted: #9898a6;
+      --accent: #d4a373;
+      --accent-soft: rgba(212, 163, 115, 0.14);
+      --ok: #6ee7b7;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --radius: 12px;
+      --font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --serif: "Georgia", "Cambria", serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.5;
+    }
+    .container { max-width: 1220px; margin: 0 auto; padding: 28px 24px 64px; }
+    header {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+      gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 24px;
+    }
+    h1 { margin: 0; font-size: 24px; font-weight: 650; letter-spacing: -0.02em; }
+    .subtitle { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+      border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border);
+      font-size: 12.5px; color: var(--muted);
+    }
+    .pill strong { color: var(--text); font-weight: 600; }
+    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 22px; align-items: start; }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; margin-bottom: 18px;
+    }
+    .card h2 {
+      margin: 0 0 14px; font-size: 15px; font-weight: 600; color: var(--text);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    select, input[type="text"], textarea {
+      width: 100%; background: var(--surface-2); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+      font-family: inherit; font-size: 13.5px; outline: none;
+    }
+    select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 88px; }
+    .script-area { font-family: var(--serif); font-size: 15px; line-height: 1.65; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 550;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn:hover:not(:disabled) { border-color: var(--accent); color: #fff; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary {
+      background: var(--accent); color: #161412; border-color: var(--accent); font-weight: 650;
+    }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.08); color: #111; }
+    .btn-danger { color: var(--err); }
+    .banner {
+      padding: 10px 12px; border-radius: 8px; font-size: 12.5px; margin: 10px 0 14px;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
+    }
+    .banner.warn { border-color: rgba(251, 191, 36, 0.35); background: rgba(251, 191, 36, 0.08); color: #fde68a; }
+    .banner.ok { border-color: rgba(110, 231, 183, 0.3); background: rgba(110, 231, 183, 0.07); color: #a7f3d0; }
+    .banner.err { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.1); color: #fecaca; }
+    .voice-list { display: flex; flex-direction: column; gap: 8px; max-height: 290px; overflow-y: auto; margin-bottom: 14px; }
+    .voice-item {
+      padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--surface-2); cursor: pointer; transition: border-color 0.15s ease;
+    }
+    .voice-item.active { border-color: var(--accent); background: var(--accent-soft); }
+    .voice-item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .voice-name { font-weight: 600; font-size: 13.5px; }
+    .badge {
+      font-size: 11px; padding: 2px 8px; border-radius: 999px;
+      background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border);
+    }
+    .badge.pref { color: var(--accent); border-color: rgba(212,163,115,0.45); background: var(--accent-soft); }
+    .voice-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .sample-card {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 13px; margin-bottom: 10px;
+    }
+    .sample-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11.5px; color: var(--muted); margin: 6px 0 10px; }
+    .sample-meta span { background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 6px; }
+    audio { width: 100%; height: 36px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .tab { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+    .tab.active { background: var(--surface-2); border-color: var(--border); color: var(--text); font-weight: 600; }
+    .hidden { display: none; }
+    .checkbox-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--muted); margin: 10px 0 14px; }
+    .checkbox-row input { margin-top: 3px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>NovelFlow — Voice Testing Lab</h1>
+        <div class="subtitle">Local offline Qwen3-TTS auditioning, narration benchmarking, and voice profile builder</div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="pill" id="hwPill">Detecting hardware...</div>
+        <div class="pill" id="enginePill">Engine: <strong>Idle</strong></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>
+            <span>1. Active TTS Model & Device</span>
+            <span class="badge" id="licenseBadge">Apache-2.0 • 100% Local</span>
+          </h2>
+          <div class="row">
+            <div>
+              <label for="modelSelect">Qwen3-TTS Checkpoint</label>
+              <select id="modelSelect"></select>
+            </div>
+            <div>
+              <label for="deviceSelect">Execution Device</label>
+              <select id="deviceSelect">
+                <option value="auto">Auto (Hardware Recommended)</option>
+                <option value="cuda">CUDA GPU (bfloat16)</option>
+                <option value="cpu">CPU Fallback (float32)</option>
+              </select>
+            </div>
+          </div>
+          <div id="modelCapsBanner" class="banner"></div>
+          <div id="modelCompatBanner" class="banner hidden"></div>
+        </div>
+
+        <div class="card">
+          <h2>
+            <span>2. Select Voice Profile</span>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" id="preferVoiceBtn" disabled>Set Preferred</button>
+              <button class="btn btn-danger" id="deleteVoiceBtn" disabled>Delete</button>
+            </div>
+          </h2>
+          <div class="voice-list" id="voiceList"></div>
+
+          <label for="scriptInput" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Sample Audition Script</span>
+            <button class="btn" id="resetScriptBtn" style="padding:3px 10px; font-size:11.5px;">Reset Fixed Script</button>
+          </label>
+          <textarea id="scriptInput" class="script-area"></textarea>
+
+          <div id="instructBox" style="margin-top:12px;">
+            <label for="instructInput">Narration Style / Voice Instruction (Supported by Selected Model)</label>
+            <textarea id="instructInput" style="min-height:68px;"></textarea>
+          </div>
+          <div id="instructDisabledNotice" class="banner hidden" style="margin-top:12px;">
+            Style instructions are disabled for this checkpoint (verified in Qwen3-TTS: <code>0.6B-CustomVoice</code> and <code>Base</code> checkpoints do not accept runtime <code>instruct</code> prompts).
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px;">
+            <span id="genStatus" style="font-size:12.5px; color:var(--muted);">Ready to generate offline sample.</span>
+            <button class="btn btn-primary" id="generateBtn">Generate Sample</button>
+          </div>
+          <div id="genError" class="banner err hidden"></div>
+        </div>
+
+        <div class="card">
+          <h2>3. Create Custom Narrator or Clone Voice</h2>
+          <div class="tabs">
+            <button class="tab active" data-tab="designTab">Voice Design (Text Prompt)</button>
+            <button class="tab" data-tab="cloneTab">Voice Cloning (Authorized Audio)</button>
+          </div>
+
+          <div id="designTab">
+            <label for="designName">Profile Name</label>
+            <input type="text" id="designName" placeholder="e.g., Midnight Scholar Baritone" />
+            <div style="margin-top:10px;">
+              <label for="designDesc">Short Description</label>
+              <input type="text" id="designDesc" placeholder="e.g., Calm, scholarly mature male baritone" />
+            </div>
+            <div style="margin-top:10px;">
+              <label for="designInstruct">Voice Design Instruction (Uses 1.7B-VoiceDesign)</label>
+              <textarea id="designInstruct" placeholder="Describe age, gender, tone, accent, breathing, pacing, and dry studio quality..."></textarea>
+            </div>
+            <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span id="designStatus" style="font-size:12px; color:var(--muted);">Creates a reusable reference profile playable on 0.6B-Base GPU.</span>
+              <button class="btn btn-primary" id="createDesignBtn">Design & Save Voice</button>
+            </div>
+          </div>
+
+          <div id="cloneTab" class="hidden">
+            <label for="cloneName">Cloned Profile Name</label>
+            <input type="text" id="cloneName" placeholder="e.g., My Narrator Sample" />
+            <div style="margin-top:10px;">
+              <label for="cloneFile">Reference Audio (WAV/MP3/FLAC, 3–25s clean speech)</label>
+              <input type="file" id="cloneFile" accept=".wav,.mp3,.flac,.ogg,.m4a" style="color:var(--muted); font-size:12.5px;" />
+            </div>
+            <div style="margin-top:10px;">
+              <label for="cloneTranscript">Exact Transcript of Reference Audio</label>
+              <textarea id="cloneTranscript" style="min-height:66px;" placeholder="Type the exact words spoken in the reference recording..."></textarea>
+            </div>
+            <label class="checkbox-row">
+              <input type="checkbox" id="cloneConsent" />
+              <span>I confirm I have explicit permission and legal rights to clone this speaker's voice for personal offline audiobook use.</span>
+            </label>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span id="cloneStatus" style="font-size:12px; color:var(--muted);">Stored strictly locally in storage/voices/.</span>
+              <button class="btn btn-primary" id="createCloneBtn">Save Cloned Profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>
+            <span>Comparison Rack</span>
+            <select id="playbackSpeed" style="width:auto; padding:5px 10px; font-size:12px;">
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1.0x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </h2>
+          <div style="font-size:12.5px; color:var(--muted); margin-bottom:12px;">
+            Audition and A/B compare generated narrator samples side-by-side with full latency, RTF, and VRAM telemetry.
+          </div>
+          <div id="samplesList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      hardware: null,
+      models: [],
+      voices: [],
+      samples: [],
+      selectedModelId: "Qwen/Qwen3-TTS-12Hz-0.6B-Base",
+      selectedVoiceId: "narrator-deep-cinematic",
+      fixedScript: "",
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    async function api(url, opts = {}) {
+      const res = await fetch(url, opts);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+      return data;
+    }
+
+    function renderHardware() {
+      const h = state.hardware;
+      if (!h) return;
+      $("hwPill").innerHTML = h.cuda_available
+        ? `GPU: <strong>${h.gpu_name}</strong> (${h.vram_total_gb} GB VRAM) • RAM: <strong>${h.ram_total_gb} GB</strong>`
+        : `CPU: <strong>${h.cpu_name}</strong> • RAM: <strong>${h.ram_total_gb} GB</strong>`;
+    }
+
+    function renderModels() {
+      const sel = $("modelSelect");
+      sel.innerHTML = "";
+      for (const m of state.models) {
+        const opt = document.createElement("option");
+        opt.value = m.model_id;
+        opt.textContent = `${m.display_name} ${m.is_downloaded ? "✓ Local" : "(Not Downloaded)"}`;
+        if (m.model_id === state.selectedModelId) opt.selected = true;
+        sel.appendChild(opt);
+      }
+      updateModelStatus();
+    }
+
+    function updateModelStatus() {
+      const m = state.models.find((x) => x.model_id === state.selectedModelId);
+      if (!m) return;
+      const caps = [];
+      if (m.supports_voice_clone) caps.push("Voice Cloning / Reusable Narrator Profiles");
+      if (m.supports_preset_speakers) caps.push("9 Preset Speakers");
+      if (m.supports_voice_design) caps.push("Natural-Language Voice Design");
+      caps.push(m.supports_instruct ? "Style Instruct: Supported" : "Style Instruct: Not Supported");
+
+      $("modelCapsBanner").className = "banner ok";
+      $("modelCapsBanner").innerHTML =
+        `<strong>${m.short_name}</strong> (${m.parameter_tier}, ~${m.disk_size_gb} GB, ${m.license})<br>` +
+        `Capabilities: ${caps.join(" • ")}` +
+        (m.is_downloaded ? "" : ` — <button class="btn" onclick="downloadSelectedModel()" style="padding:3px 9px; margin-left:6px;">Download Model</button>`);
+
+      const compat = m.compatibility;
+      if (compat.warning) {
+        $("modelCompatBanner").className = "banner warn";
+        $("modelCompatBanner").textContent = compat.warning;
+        $("modelCompatBanner").classList.remove("hidden");
+      } else {
+        $("modelCompatBanner").classList.add("hidden");
+      }
+
+      if (m.supports_instruct) {
+        $("instructBox").classList.remove("hidden");
+        $("instructDisabledNotice").classList.add("hidden");
+      } else {
+        $("instructBox").classList.add("hidden");
+        $("instructDisabledNotice").classList.remove("hidden");
+      }
+
+      if (m.is_active) {
+        $("enginePill").innerHTML = `Active: <strong>${m.short_name}</strong> (${m.active_device}, ${m.active_dtype})`;
+      }
+      renderVoices();
+    }
+
+    function renderVoices() {
+      const compatVoices = state.voices.filter((v) => v.compatible_models.includes(state.selectedModelId));
+      if (!compatVoices.some((v) => v.voice_id === state.selectedVoiceId)) {
+        state.selectedVoiceId = compatVoices[0]?.voice_id || "";
+      }
+
+      const list = $("voiceList");
+      list.innerHTML = "";
+      for (const v of compatVoices) {
+        const div = document.createElement("div");
+        div.className = `voice-item ${v.voice_id === state.selectedVoiceId ? "active" : ""}`;
+        div.onclick = () => {
+          state.selectedVoiceId = v.voice_id;
+          if (v.instruct_prompt && !$("instructInput").value.trim()) {
+            $("instructInput").value = v.instruct_prompt;
+          } else if (v.instruct_prompt) {
+            $("instructInput").value = v.instruct_prompt;
+          }
+          renderVoices();
+        };
+        div.innerHTML = `
+          <div class="voice-item-top">
+            <span class="voice-name">${v.name}</span>
+            <div style="display:flex; gap:6px;">
+              ${v.is_preferred ? '<span class="badge pref">Preferred</span>' : ""}
+              <span class="badge">${v.kind === "designed_narrator" ? "Narrator" : v.kind}</span>
+            </div>
+          </div>
+          <div class="voice-desc">${v.description}</div>
+        `;
+        list.appendChild(div);
+      }
+
+      const activeVoice = compatVoices.find((v) => v.voice_id === state.selectedVoiceId);
+      $("preferVoiceBtn").disabled = !activeVoice || activeVoice.is_preferred;
+      $("deleteVoiceBtn").disabled = !activeVoice || activeVoice.is_builtin;
+      if (activeVoice && activeVoice.instruct_prompt) {
+        $("instructInput").value = activeVoice.instruct_prompt;
+      }
+    }
+
+    function renderSamples() {
+      const container = $("samplesList");
+      if (!state.samples.length) {
+        container.innerHTML = '<div class="banner">No samples generated yet. Pick a narrator and click Generate Sample.</div>';
+        return;
+      }
+      const speed = parseFloat($("playbackSpeed").value || "1");
+      container.innerHTML = "";
+      for (const s of state.samples) {
+        const card = document.createElement("div");
+        card.className = "sample-card";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <strong style="font-size:13.5px;">${s.voice_name}</strong>
+            <button class="btn btn-danger" style="padding:3px 9px; font-size:11px;" onclick="deleteSample('${s.sample_id}')">Remove</button>
+          </div>
+          <div class="sample-meta">
+            <span>${s.model_id.split("/").pop()}</span>
+            <span>${s.device_used} (${s.dtype_used})</span>
+            <span>Audio: ${s.audio_duration_sec}s</span>
+            <span>Gen: ${s.generation_sec}s (${s.rtf}x RTF)</span>
+            <span>VRAM: ${s.peak_vram_mb} MB</span>
+          </div>
+          <audio controls src="${s.audio_url}"></audio>
+        `;
+        const audioEl = card.querySelector("audio");
+        audioEl.playbackRate = speed;
+        audioEl.onplay = () => { audioEl.playbackRate = parseFloat($("playbackSpeed").value || "1"); };
+        container.appendChild(card);
+      }
+    }
+
+    async function refreshAll() {
+      const [hw, models, voices, meta, samples, health] = await Promise.all([
+        api("/api/system/hardware"),
+        api("/api/models"),
+        api("/api/voices"),
+        api("/api/tts/lab/meta"),
+        api("/api/tts/lab/samples"),
+        api("/api/health"),
+      ]);
+      state.hardware = hw;
+      state.models = models;
+      state.voices = voices;
+      state.samples = samples;
+      state.fixedScript = meta.fixed_sample_script;
+      if (!$("scriptInput").value.trim()) {
+        $("scriptInput").value = state.fixedScript;
+      }
+      if (health.active_engine?.model_id) {
+        $("enginePill").innerHTML = `Active: <strong>${health.active_engine.model_id.split("/").pop()}</strong> (${health.active_engine.device}, ${health.active_engine.dtype})`;
+      }
+      renderHardware();
+      renderModels();
+      renderSamples();
+    }
+
+    window.downloadSelectedModel = async () => {
+      await api("/api/models/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model_id: state.selectedModelId }),
+      });
+      $("genStatus").textContent = "Download started in background; refresh status shortly.";
+    };
+
+    window.deleteSample = async (id) => {
+      await api(`/api/tts/lab/samples/${id}`, { method: "DELETE" });
+      state.samples = await api("/api/tts/lab/samples");
+      renderSamples();
+    };
+
+    $("modelSelect").onchange = (e) => {
+      state.selectedModelId = e.target.value;
+      updateModelStatus();
+    };
+
+    $("resetScriptBtn").onclick = () => { $("scriptInput").value = state.fixedScript; };
+
+    $("playbackSpeed").onchange = () => {
+      const speed = parseFloat($("playbackSpeed").value || "1");
+      document.querySelectorAll("audio").forEach((a) => { a.playbackRate = speed; });
+    };
+
+    $("preferVoiceBtn").onclick = async () => {
+      if (!state.selectedVoiceId) return;
+      await api(`/api/voices/${state.selectedVoiceId}/prefer`, { method: "POST" });
+      state.voices = await api("/api/voices");
+      renderVoices();
+    };
+
+    $("deleteVoiceBtn").onclick = async () => {
+      if (!state.selectedVoiceId) return;
+      await api(`/api/voices/${state.selectedVoiceId}`, { method: "DELETE" });
+      state.voices = await api("/api/voices");
+      renderVoices();
+    };
+
+    $("generateBtn").onclick = async () => {
+      $("genError").classList.add("hidden");
+      $("generateBtn").disabled = true;
+      $("genStatus").textContent = "Synthesizing locally on Qwen3-TTS... (first model load takes ~5-10s)";
+      try {
+        const m = state.models.find((x) => x.model_id === state.selectedModelId);
+        const res = await api("/api/tts/lab/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            voice_id: state.selectedVoiceId,
+            model_id: state.selectedModelId,
+            text: $("scriptInput").value,
+            instruct: m?.supports_instruct ? $("instructInput").value : null,
+            device: $("deviceSelect").value,
+          }),
+        });
+        $("genStatus").textContent = `Generated ${res.audio_duration_sec}s in ${res.generation_sec}s (${res.rtf}x RTF) on ${res.device_used}.`;
+        await refreshAll();
+      } catch (err) {
+        $("genError").textContent = err.message;
+        $("genError").classList.remove("hidden");
+        $("genStatus").textContent = "Generation failed.";
+      } finally {
+        $("generateBtn").disabled = false;
+      }
+    };
+
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.onclick = () => {
+        document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        $("designTab").classList.toggle("hidden", btn.dataset.tab !== "designTab");
+        $("cloneTab").classList.toggle("hidden", btn.dataset.tab !== "cloneTab");
+      };
+    });
+
+    $("createDesignBtn").onclick = async () => {
+      $("createDesignBtn").disabled = true;
+      $("designStatus").textContent = "Designing custom voice with 1.7B-VoiceDesign...";
+      try {
+        const out = await api("/api/voices/design", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: $("designName").value,
+            description: $("designDesc").value,
+            instruct: $("designInstruct").value,
+            device: $("deviceSelect").value,
+          }),
+        });
+        $("designStatus").textContent = `Saved '${out.profile.name}' (${out.metrics.generation_sec}s on ${out.metrics.device_used}).`;
+        state.voices = await api("/api/voices");
+        state.selectedVoiceId = out.profile.voice_id;
+        renderVoices();
+      } catch (err) {
+        $("designStatus").textContent = `Error: ${err.message}`;
+      } finally {
+        $("createDesignBtn").disabled = false;
+      }
+    };
+
+    $("createCloneBtn").onclick = async () => {
+      const file = $("cloneFile").files[0];
+      if (!file) { $("cloneStatus").textContent = "Please choose a reference audio file."; return; }
+      const fd = new FormData();
+      fd.append("name", $("cloneName").value);
+      fd.append("description", "Authorized local cloned narrator voice");
+      fd.append("ref_text", $("cloneTranscript").value);
+      fd.append("consent_confirmed", $("cloneConsent").checked ? "true" : "false");
+      fd.append("audio_file", file);
+      $("createCloneBtn").disabled = true;
+      $("cloneStatus").textContent = "Validating and saving local reference...";
+      try {
+        const profile = await api("/api/voices/clone", { method: "POST", body: fd });
+        $("cloneStatus").textContent = `Saved '${profile.name}'. Switch to a Base checkpoint to audition it.`;
+        state.voices = await api("/api/voices");
+        renderVoices();
+      } catch (err) {
+        $("cloneStatus").textContent = `Error: ${err.message}`;
+      } finally {
+        $("createCloneBtn").disabled = false;
+      }
+    };
+
+    refreshAll();
+  </script>
+</body>
+</html>
+

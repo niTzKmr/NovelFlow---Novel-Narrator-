@@ -1,0 +1,37 @@
+# Python / Backend
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Local caches & model weights (large binaries downloaded locally)
+.cache/
+models/hf_cache/
+models/*.safetensors
+models/*.bin
+models/Qwen*
+
+# Local runtime storage (books, generated audio, voice references, sqlite db)
+storage/books/*
+storage/audio/*
+storage/voices/*
+storage/cache/*
+storage/db/*
+!storage/books/.gitkeep
+!storage/audio/.gitkeep
+!storage/voices/.gitkeep
+!storage/cache/.gitkeep
+!storage/db/.gitkeep
+
+# Node / Electron / Frontend
+node_modules/
+dist/
+dist-electron/
+release/
+release-experimental/
+*.log
+.env
+.env.local
+
