@@ -42,13 +42,15 @@ function resolveBackendPaths(): { pythonExe: string; backendDir: string; project
   const userDataRoot = path.join(app.getPath("userData"), "NovelFlowData");
   fs.mkdirSync(userDataRoot, { recursive: true });
 
-  // Also check parent directories above packaged exe (e.g. workspace D:\EPUBReader\release\win-unpacked)
+  // Also check portable folder beside exe AND parent directories above packaged exe
   const exeDir = path.dirname(app.getPath("exe"));
   const workspaceFallback = path.resolve(exeDir, "..", "..");
+  const portablePython = path.join(exeDir, "python-runtime", "python.exe");
   const workspaceVenvPython = path.join(workspaceFallback, "backend", ".venv", "Scripts", "python.exe");
 
   const candidates = [
     process.env.NOVELFLOW_PYTHON_EXE,
+    portablePython,
     path.join(exeDir, "backend", ".venv", "Scripts", "python.exe"),
     path.join(app.getPath("userData"), "venv", "Scripts", "python.exe"),
     workspaceVenvPython,
@@ -57,9 +59,14 @@ function resolveBackendPaths(): { pythonExe: string; backendDir: string; project
   ].filter((p): p is string => Boolean(p));
 
   const pythonExe = candidates.find((p) => p === "python" || fs.existsSync(p)) || "python";
+  const hasPortableData = fs.existsSync(path.join(exeDir, "models")) || fs.existsSync(path.join(exeDir, "storage"));
   const projectRoot =
     process.env.NOVELFLOW_PROJECT_ROOT ||
-    (fs.existsSync(path.join(workspaceFallback, "models")) ? workspaceFallback : userDataRoot);
+    (hasPortableData
+      ? exeDir
+      : fs.existsSync(path.join(workspaceFallback, "models"))
+      ? workspaceFallback
+      : userDataRoot);
   return { pythonExe, backendDir: resBackend, projectRoot };
 }
 
@@ -79,12 +86,13 @@ async function ensureBackendRunning(): Promise<void> {
   spawnedByUs = true;
   backendProcess = spawn(
     pythonExe,
-    ["-m", "uvicorn", "app.main:app", "--host", BACKEND_HOST, "--port", String(BACKEND_PORT)],
+    ["-s", "-m", "uvicorn", "app.main:app", "--host", BACKEND_HOST, "--port", String(BACKEND_PORT)],
     {
       cwd: backendDir,
       env: {
         ...process.env,
         PYTHONPATH: backendDir,
+        PYTHONNOUSERSITE: "1",
         NOVELFLOW_PROJECT_ROOT: projectRoot,
         HF_HUB_DISABLE_SYMLINKS_WARNING: "1",
       },
