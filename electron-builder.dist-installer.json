@@ -1,0 +1,60 @@
+{
+  "appId": "com.novelflow.studio",
+  "productName": "NovelFlow Studio",
+  "directories": {
+    "output": "D:/NovelFlow-Installer-Dist"
+  },
+  "files": [
+    "dist/**/*",
+    "dist-electron/**/*",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "backend/app",
+      "to": "backend/app"
+    },
+    {
+      "from": "backend/requirements.txt",
+      "to": "backend/requirements.txt"
+    },
+    {
+      "from": "models/README.md",
+      "to": "models/README.md"
+    },
+    {
+      "from": "docs/THIRD_PARTY_LICENSES.md",
+      "to": "docs/THIRD_PARTY_LICENSES.md"
+    },
+    {
+      "from": ".cache/installer-resources/python-base",
+      "to": "python-base"
+    },
+    {
+      "from": ".cache/installer-resources/seed-refs",
+      "to": "seed-refs"
+    }
+  ],
+  "win": {
+    "signAndEditExecutable": false,
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "dir",
+        "arch": ["x64"]
+      }
+    ],
+    "artifactName": "NovelFlow-Studio-Setup-${version}-${arch}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  }
+}
+
