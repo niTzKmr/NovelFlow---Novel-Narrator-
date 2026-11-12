@@ -70,7 +70,7 @@ export function AudiobookPlayerBar() {
   };
 
   return (
-    <footer className="h-[74px] shrink-0 bg-[#141419] border-t border-[#25252f] px-5 flex items-center justify-between gap-4 select-none">
+    <footer className="h-[74px] shrink-0 bg-[#101218] border-t border-[#212533] px-5 flex items-center justify-between gap-4 select-none">
       {/* Left: Book / Chapter / Narrator */}
       <div className="min-w-0 w-72 flex items-center gap-3">
         <div className="min-w-0">
@@ -100,7 +100,7 @@ export function AudiobookPlayerBar() {
           </button>
           <button
             onClick={() => togglePlayPause()}
-            className="w-9 h-9 rounded-full bg-[#d4a373] text-[#141210] flex items-center justify-center hover:brightness-105 transition"
+            className="w-9 h-9 rounded-full bg-[#e5a95e] text-[#13110e] flex items-center justify-center hover:bg-[#eeb973] shadow-md shadow-[#e5a95e]/20 transition"
             title={isPlaying ? "Pause Narration" : "Play Narration"}
           >
             {isBuffering ? (
@@ -129,14 +129,14 @@ export function AudiobookPlayerBar() {
 
         <div className="w-full flex items-center gap-2.5 text-[11px] text-[#878796]">
           <span className="w-9 text-right tabular-nums">{formatDuration(chunkCurrentTimeSec)}</span>
-          <div className="flex-1 h-1.5 rounded-full bg-[#24242d] overflow-hidden relative">
+          <div className="flex-1 h-1.5 rounded-full bg-[#222634] overflow-hidden relative">
             <div
-              className="h-full bg-[#d4a373]/30 absolute left-0 top-0 transition-all"
+              className="h-full bg-emerald-400/25 absolute left-0 top-0 transition-all"
               style={{ width: totalChunks > 0 ? `${(cachedCount / totalChunks) * 100}%` : "0%" }}
               title={`Cached ${cachedCount}/${totalChunks} segments`}
             />
             <div
-              className="h-full bg-[#d4a373] relative transition-all"
+              className="h-full bg-[#e5a95e] relative transition-all"
               style={{
                 width:
                   totalChunks > 0

@@ -2,13 +2,34 @@
 
 :root {
   color-scheme: dark;
-  --nf-bg: #0f0f12;
-  --nf-surface: #16161b;
-  --nf-surface-elevated: #1e1e25;
-  --nf-border: #272730;
-  --nf-text: #ececef;
-  --nf-muted: #9898a6;
-  --nf-accent: #d4a373;
+  --nf-bg: #0b0c10;
+  --nf-surface: #13151c;
+  --nf-surface-elevated: #1b1e28;
+  --nf-border: #252a38;
+  --nf-text: #f4f5f8;
+  --nf-muted: #98a0b3;
+  --nf-accent: #e5a95e;
+  --nf-accent-emerald: #34d399;
+}
+
+.nf-drag {
+  -webkit-app-region: drag;
+}
+.nf-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+@keyframes nfSplashSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+.nf-splash-sweep {
+  animation: nfSplashSweep 1.35s ease-in-out infinite;
 }
 
 * {
@@ -34,11 +55,11 @@ body,
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2c2c36;
+  background: #272b39;
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3d3d4a;
+  background: #393f52;
 }
 
 /* Reader sentence highlight and clickable hover styling */
@@ -49,11 +70,11 @@ body,
   cursor: pointer;
 }
 .nf-sentence:hover {
-  background-color: rgba(212, 163, 115, 0.14);
+  background-color: rgba(229, 169, 94, 0.14);
 }
 .nf-sentence-active {
-  background-color: rgba(212, 163, 115, 0.28) !important;
-  box-shadow: 0 0 0 2px rgba(212, 163, 115, 0.22);
+  background-color: rgba(229, 169, 94, 0.28) !important;
+  box-shadow: 0 0 0 2px rgba(229, 169, 94, 0.22);
 }
 
 .nf-prose p {

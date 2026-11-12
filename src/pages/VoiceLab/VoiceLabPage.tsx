@@ -232,7 +232,7 @@ export function VoiceLabPage() {
             Audition narrators locally, compare speed and VRAM telemetry, design new voices, or clone authorized audio.
           </p>
         </div>
-        <div className="px-3.5 py-2 rounded-xl bg-[#16161b] border border-[#262630] text-xs text-[#9c9caa]">
+        <div className="px-3.5 py-2 rounded-xl bg-[#13151c] border border-[#262630] text-xs text-[#9c9caa]">
           {hardware?.cuda_available
             ? `GPU: ${hardware.gpu_name} (${hardware.vram_total_gb} GB VRAM)`
             : `CPU: ${hardware?.cpu_name || "Detecting..."}`}
@@ -242,14 +242,14 @@ export function VoiceLabPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-7 space-y-5">
           {/* Model & Compatibility Card */}
-          <div className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+          <div className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[#8d8d9b] mb-1.5">Active Qwen3-TTS Checkpoint</label>
                 <select
                   value={selectedModelId}
                   onChange={(e) => setSelectedModelId(e.target.value)}
-                  className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#d4a373]"
+                  className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e5a95e]"
                 >
                   {models.map((m) => (
                     <option key={m.model_id} value={m.model_id}>
@@ -263,7 +263,7 @@ export function VoiceLabPage() {
                 <select
                   value={device}
                   onChange={(e) => setDevice(e.target.value as "auto" | "cuda" | "cpu")}
-                  className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#d4a373]"
+                  className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e5a95e]"
                 >
                   <option value="auto">Auto (Recommended)</option>
                   <option value="cuda">CUDA GPU (bfloat16)</option>
@@ -274,7 +274,7 @@ export function VoiceLabPage() {
 
             {selectedModel && (
               <div className="space-y-2 text-xs">
-                <div className="rounded-xl bg-[#1c1c23] border border-[#292934] px-3.5 py-2.5 flex items-center justify-between gap-3">
+                <div className="rounded-xl bg-[#191c26] border border-[#292934] px-3.5 py-2.5 flex items-center justify-between gap-3">
                   <div className="text-[#b8b8c6]">
                     <strong className="text-[#f1f1f4]">{selectedModel.short_name}</strong> •{" "}
                     {selectedModel.license} •{" "}
@@ -284,7 +284,7 @@ export function VoiceLabPage() {
                     <button
                       disabled={downloadingModelId !== null}
                       onClick={() => void handleDownloadModel(selectedModel.model_id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#d4a373] text-[#141210] font-semibold disabled:opacity-60 shrink-0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#e5a95e] text-[#141210] font-semibold disabled:opacity-60 shrink-0"
                     >
                       {downloadingModelId === selectedModel.model_id ? (
                         <>
@@ -310,16 +310,16 @@ export function VoiceLabPage() {
           </div>
 
           {/* Voice Selection + Script + Generate */}
-          <div className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+          <div className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-[#f1f1f4]">Compatible Voices</h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreferVoice}
                   disabled={!activeVoice}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#21212a] border border-[#2f2f3c] text-xs text-[#ececef] hover:border-[#d4a373]/50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#21212a] border border-[#2f2f3c] text-xs text-[#ececef] hover:border-[#e5a95e]/50"
                 >
-                  <Star className={`w-3.5 h-3.5 ${activeVoice?.is_preferred ? "fill-[#d4a373] text-[#d4a373]" : ""}`} />
+                  <Star className={`w-3.5 h-3.5 ${activeVoice?.is_preferred ? "fill-[#e5a95e] text-[#e5a95e]" : ""}`} />
                   {activeVoice?.is_preferred ? "Active Narrator" : "Use as Narrator"}
                 </button>
                 <button
@@ -342,15 +342,15 @@ export function VoiceLabPage() {
                     onClick={() => setSelectedVoiceId(v.voice_id)}
                     className={`w-full text-left p-3 rounded-xl border transition ${
                       selected
-                        ? "bg-[#d4a373]/14 border-[#d4a373]/55"
-                        : "bg-[#1c1c23] border-[#282833] hover:border-[#373746]"
+                        ? "bg-[#e5a95e]/14 border-[#e5a95e]/55"
+                        : "bg-[#191c26] border-[#282833] hover:border-[#373746]"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs font-semibold text-[#f1f1f4]">{v.name}</span>
                       <div className="flex items-center gap-1.5">
                         {v.is_preferred && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d4a373]/20 text-[#d4a373] font-medium">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#e5a95e]/20 text-[#e5a95e] font-medium">
                             Preferred
                           </span>
                         )}
@@ -370,7 +370,7 @@ export function VoiceLabPage() {
                 <label className="text-xs text-[#8d8d9b]">Sample Audition Script</label>
                 <button
                   onClick={() => setScriptText(fixedScript)}
-                  className="inline-flex items-center gap-1 text-[11px] text-[#d4a373] hover:underline"
+                  className="inline-flex items-center gap-1 text-[11px] text-[#e5a95e] hover:underline"
                 >
                   <RotateCcw className="w-3 h-3" /> Reset Fixed Script
                 </button>
@@ -379,7 +379,7 @@ export function VoiceLabPage() {
                 rows={3}
                 value={scriptText}
                 onChange={(e) => setScriptText(e.target.value)}
-                className="w-full bg-[#1d1d24] border border-[#2c2c38] rounded-xl px-3.5 py-2.5 text-sm font-serif text-[#f1f1f4] outline-none focus:border-[#d4a373]"
+                className="w-full bg-[#181b24] border border-[#2b3040] rounded-xl px-3.5 py-2.5 text-sm font-serif text-[#f1f1f4] outline-none focus:border-[#e5a95e]"
               />
             </div>
 
@@ -392,7 +392,7 @@ export function VoiceLabPage() {
                   rows={2}
                   value={instructText}
                   onChange={(e) => setInstructText(e.target.value)}
-                  className="w-full bg-[#1d1d24] border border-[#2c2c38] rounded-xl px-3 py-2 text-xs text-[#ececef] outline-none focus:border-[#d4a373]"
+                  className="w-full bg-[#181b24] border border-[#2b3040] rounded-xl px-3 py-2 text-xs text-[#ececef] outline-none focus:border-[#e5a95e]"
                 />
               </div>
             )}
@@ -402,7 +402,7 @@ export function VoiceLabPage() {
               <button
                 onClick={handleGenerate}
                 disabled={generating || !activeVoice}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50 shrink-0"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e5a95e] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50 shrink-0"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 {generating ? "Synthesizing..." : "Generate Sample"}
@@ -411,24 +411,24 @@ export function VoiceLabPage() {
           </div>
 
           {/* Voice Design & Cloning Studio */}
-          <div className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+          <div className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
             <div className="flex items-center gap-2 border-b border-[#24242f] pb-3">
               <button
                 onClick={() => setStudioTab("design")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
-                  studioTab === "design" ? "bg-[#24242e] text-white" : "text-[#8d8d9b] hover:text-white"
+                  studioTab === "design" ? "bg-[#222634] text-white" : "text-[#8d8d9b] hover:text-white"
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#d4a373]" />
+                <Sparkles className="w-3.5 h-3.5 text-[#e5a95e]" />
                 Voice Design (Text Prompt)
               </button>
               <button
                 onClick={() => setStudioTab("clone")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
-                  studioTab === "clone" ? "bg-[#24242e] text-white" : "text-[#8d8d9b] hover:text-white"
+                  studioTab === "clone" ? "bg-[#222634] text-white" : "text-[#8d8d9b] hover:text-white"
                 }`}
               >
-                <Mic2 className="w-3.5 h-3.5 text-[#d4a373]" />
+                <Mic2 className="w-3.5 h-3.5 text-[#e5a95e]" />
                 Voice Cloning (Authorized Audio)
               </button>
             </div>
@@ -441,14 +441,14 @@ export function VoiceLabPage() {
                     value={designName}
                     onChange={(e) => setDesignName(e.target.value)}
                     placeholder="Profile name (e.g., Midnight Narrator)"
-                    className="bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white outline-none focus:border-[#d4a373]"
+                    className="bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white outline-none focus:border-[#e5a95e]"
                   />
                   <input
                     type="text"
                     value={designDesc}
                     onChange={(e) => setDesignDesc(e.target.value)}
                     placeholder="Short description"
-                    className="bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white outline-none focus:border-[#d4a373]"
+                    className="bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white outline-none focus:border-[#e5a95e]"
                   />
                 </div>
                 <textarea
@@ -456,13 +456,13 @@ export function VoiceLabPage() {
                   value={designInstruct}
                   onChange={(e) => setDesignInstruct(e.target.value)}
                   placeholder="Describe voice timbre, age, accent, breathing, pacing, and clean studio recording quality..."
-                  className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white outline-none focus:border-[#d4a373]"
+                  className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white outline-none focus:border-[#e5a95e]"
                 />
                 <div className="flex justify-end">
                   <button
                     onClick={handleDesignVoice}
                     disabled={creatingDesign || !designName.trim() || !designInstruct.trim()}
-                    className="px-4 py-2 rounded-xl bg-[#d4a373] text-[#141210] font-semibold disabled:opacity-45"
+                    className="px-4 py-2 rounded-xl bg-[#e5a95e] text-[#141210] font-semibold disabled:opacity-45"
                   >
                     {creatingDesign ? "Designing..." : "Design & Save Profile"}
                   </button>
@@ -476,7 +476,7 @@ export function VoiceLabPage() {
                     value={cloneName}
                     onChange={(e) => setCloneName(e.target.value)}
                     placeholder="Cloned voice name"
-                    className="flex-1 bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white outline-none focus:border-[#d4a373]"
+                    className="flex-1 bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white outline-none focus:border-[#e5a95e]"
                   />
                   <button
                     onClick={handlePickCloneAudio}
@@ -491,14 +491,14 @@ export function VoiceLabPage() {
                   value={cloneTranscript}
                   onChange={(e) => setCloneTranscript(e.target.value)}
                   placeholder="Exact transcript spoken in the reference recording..."
-                  className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white outline-none focus:border-[#d4a373]"
+                  className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white outline-none focus:border-[#e5a95e]"
                 />
                 <label className="flex items-start gap-2 text-[#a0a0ae] cursor-pointer">
                   <input
                     type="checkbox"
                     checked={cloneConsent}
                     onChange={(e) => setCloneConsent(e.target.checked)}
-                    className="mt-0.5 accent-[#d4a373]"
+                    className="mt-0.5 accent-[#e5a95e]"
                   />
                   <span>
                     I confirm I own or have explicit permission to use this speaker's voice recording for local offline narration.
@@ -508,7 +508,7 @@ export function VoiceLabPage() {
                   <button
                     onClick={handleCloneVoice}
                     disabled={creatingClone || !cloneFile || !cloneName.trim() || !cloneTranscript.trim() || !cloneConsent}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#d4a373] text-[#141210] font-semibold disabled:opacity-45"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#e5a95e] text-[#141210] font-semibold disabled:opacity-45"
                   >
                     <Check className="w-3.5 h-3.5" />
                     {creatingClone ? "Saving..." : "Save Cloned Profile"}
@@ -520,13 +520,13 @@ export function VoiceLabPage() {
         </div>
 
         {/* Right: Side-by-side Audition Rack */}
-        <div className="lg:col-span-5 rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+        <div className="lg:col-span-5 rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[#f1f1f4]">Comparison Rack</h2>
             <select
               value={playbackSpeed}
               onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-              className="bg-[#1e1e26] border border-[#2c2c38] rounded-lg px-2 py-1 text-xs text-[#ececef]"
+              className="bg-[#1b1e28] border border-[#2b3040] rounded-lg px-2 py-1 text-xs text-[#ececef]"
             >
               {[0.75, 1.0, 1.25, 1.5].map((sp) => (
                 <option key={sp} value={sp}>
@@ -538,12 +538,12 @@ export function VoiceLabPage() {
 
           <div className="space-y-3 max-h-[680px] overflow-y-auto pr-1">
             {samples.length === 0 ? (
-              <div className="text-xs text-[#888896] p-4 rounded-xl bg-[#1c1c23]">
+              <div className="text-xs text-[#888896] p-4 rounded-xl bg-[#191c26]">
                 No audition samples yet. Select a narrator and click Generate Sample.
               </div>
             ) : (
               samples.map((s) => (
-                <div key={s.sample_id} className="rounded-xl bg-[#1c1c23] border border-[#282834] p-3.5 space-y-2.5">
+                <div key={s.sample_id} className="rounded-xl bg-[#191c26] border border-[#282834] p-3.5 space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-[#f1f1f4]">{s.voice_name}</span>
                     <button

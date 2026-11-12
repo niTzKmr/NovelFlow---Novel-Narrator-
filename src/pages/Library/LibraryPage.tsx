@@ -128,8 +128,8 @@ export function LibraryPage() {
     >
       {dragging && (
         <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-          <div className="rounded-2xl border-2 border-dashed border-[#d4a373] bg-[#16161b] px-10 py-8 text-center space-y-2">
-            <Upload className="w-9 h-9 text-[#d4a373] mx-auto" />
+          <div className="rounded-2xl border-2 border-dashed border-[#e5a95e] bg-[#13151c] px-10 py-8 text-center space-y-2">
+            <Upload className="w-9 h-9 text-[#e5a95e] mx-auto" />
             <div className="text-base font-medium text-white">Drop EPUB files to import locally</div>
           </div>
         </div>
@@ -149,21 +149,21 @@ export function LibraryPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filter title or author..."
-              className="pl-8 pr-3 py-2 rounded-xl bg-[#16161b] border border-[#262630] text-xs text-[#ececef] outline-none focus:border-[#d4a373] w-56"
+              className="pl-8 pr-3 py-2 rounded-xl bg-[#13151c] border border-[#262630] text-xs text-[#ececef] outline-none focus:border-[#e5a95e] w-56"
             />
           </div>
 
-          <div className="flex items-center rounded-xl bg-[#16161b] border border-[#262630] p-0.5">
+          <div className="flex items-center rounded-xl bg-[#13151c] border border-[#262630] p-0.5">
             <button
               onClick={() => setLayout("grid")}
-              className={`p-1.5 rounded-lg ${layout === "grid" ? "bg-[#25252f] text-white" : "text-[#848494]"}`}
+              className={`p-1.5 rounded-lg ${layout === "grid" ? "bg-[#252a38] text-white" : "text-[#848494]"}`}
               title="Grid View"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setLayout("list")}
-              className={`p-1.5 rounded-lg ${layout === "list" ? "bg-[#25252f] text-white" : "text-[#848494]"}`}
+              className={`p-1.5 rounded-lg ${layout === "list" ? "bg-[#252a38] text-white" : "text-[#848494]"}`}
               title="List View"
             >
               <List className="w-4 h-4" />
@@ -173,7 +173,7 @@ export function LibraryPage() {
           <button
             onClick={handleBrowse}
             disabled={importing}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e5a95e] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             {importing ? "Importing..." : "Add EPUB"}
@@ -197,8 +197,8 @@ export function LibraryPage() {
               onClick={() => setSection(t.id)}
               className={`px-3 py-1.5 rounded-lg text-xs transition ${
                 section === t.id
-                  ? "bg-[#d4a373]/18 text-[#d4a373] border border-[#d4a373]/35 font-medium"
-                  : "bg-[#16161b] border border-[#25252f] text-[#9b9ba9] hover:text-white"
+                  ? "bg-[#e5a95e]/18 text-[#e5a95e] border border-[#e5a95e]/35 font-medium"
+                  : "bg-[#13151c] border border-[#252a38] text-[#9b9ba9] hover:text-white"
               }`}
             >
               {t.label}
@@ -211,7 +211,7 @@ export function LibraryPage() {
           <select
             value={collectionFilter}
             onChange={(e) => setCollectionFilter(e.target.value)}
-            className="bg-[#16161b] border border-[#262630] rounded-lg px-2.5 py-1.5 text-xs text-[#ececef] outline-none"
+            className="bg-[#13151c] border border-[#262630] rounded-lg px-2.5 py-1.5 text-xs text-[#ececef] outline-none"
           >
             <option value="all">All Collections</option>
             {collections.map((c) => (
@@ -224,7 +224,7 @@ export function LibraryPage() {
       </div>
 
       {filteredBooks.length === 0 ? (
-        <div className="rounded-2xl bg-[#16161b] border border-[#25252f] p-12 text-center text-sm text-[#8d8d9b]">
+        <div className="rounded-2xl bg-[#13151c] border border-[#252a38] p-12 text-center text-sm text-[#8d8d9b]">
           No books match this filter. Drag and drop `.epub` files anywhere here or click Add EPUB.
         </div>
       ) : layout === "grid" ? (
@@ -237,7 +237,7 @@ export function LibraryPage() {
                   e.stopPropagation();
                   handleAssignCollection(b);
                 }}
-                className="opacity-0 group-hover:opacity-100 absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/65 text-[10px] text-white/90 hover:text-[#d4a373] transition"
+                className="opacity-0 group-hover:opacity-100 absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/65 text-[10px] text-white/90 hover:text-[#e5a95e] transition"
               >
                 {b.collection_name || "+ Collection"}
               </button>

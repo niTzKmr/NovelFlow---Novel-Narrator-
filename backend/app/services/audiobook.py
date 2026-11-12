@@ -11,7 +11,7 @@ import threading
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 import numpy as np
 import soundfile as sf
@@ -169,11 +169,10 @@ class AudiobookQueueManager:
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._job_queue: queue.Queue[str | tuple[str, Callable[[], None]]] = queue.Queue()
+        self._job_queue: queue.Queue[str] = queue.Queue()
         self._cancelled_jobs: set[str] = set()
         self._priority_sentence: dict[str, int] = {}
         self._worker_started = False
-        self._active_task_label: Optional[str] = None
 
     def start_worker(self) -> None:
         with self._lock:
@@ -416,40 +415,14 @@ class AudiobookQueueManager:
                     allow_pregenerate_next=False,
                 )
 
-    def submit_exclusive_task(self, fn: Callable[[], None], label: str = "external") -> None:
-        """Schedule an external task on the single GPU/CPU worker queue so inference is strictly serialized."""
-        self.start_worker()
-        self._job_queue.put((label, fn))
-
-    def get_queue_state(self) -> dict[str, Any]:
-        """Return whether the single GPU worker currently has an active or pending task."""
-        with self._lock:
-            active = self._active_task_label
-        pending = self._job_queue.qsize()
-        return {
-            "busy": active is not None or pending > 0,
-            "active_task": active,
-            "pending_count": pending,
-        }
-
     def _run_loop(self) -> None:
         while True:
-            item = self._job_queue.get()
+            job_id = self._job_queue.get()
             try:
-                if isinstance(item, tuple) and len(item) == 2 and callable(item[1]):
-                    label, fn = item
-                    with self._lock:
-                        self._active_task_label = label
-                    fn()
-                else:
-                    with self._lock:
-                        self._active_task_label = f"audiobook:{item}"
-                    self._process_job(item)
+                self._process_job(job_id)
             except Exception:
                 pass
             finally:
-                with self._lock:
-                    self._active_task_label = None
                 self._job_queue.task_done()
 
     def _process_job(self, job_id: str) -> None:

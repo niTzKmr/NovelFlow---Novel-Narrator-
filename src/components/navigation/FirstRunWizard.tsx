@@ -43,7 +43,7 @@ export function FirstRunWizard() {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl bg-[#16161b] border border-[#2c2c36] rounded-2xl p-6 shadow-2xl space-y-5">
+      <div className="w-full max-w-2xl bg-[#13151c] border border-[#2c2c36] rounded-2xl p-6 shadow-2xl space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#f3f3f6]">Welcome to NovelFlow</h2>
@@ -60,8 +60,8 @@ export function FirstRunWizard() {
           </button>
         </div>
 
-        <div className="rounded-xl bg-[#1d1d24] border border-[#2a2a35] p-3.5 text-xs text-[#b4b4c0] flex items-center gap-3">
-          <Cpu className="w-4 h-4 text-[#d4a373] shrink-0" />
+        <div className="rounded-xl bg-[#181b24] border border-[#2a2a35] p-3.5 text-xs text-[#b4b4c0] flex items-center gap-3">
+          <Cpu className="w-4 h-4 text-[#e5a95e] shrink-0" />
           <span>
             Detected: <strong>{hardware?.gpu_name || hardware?.cpu_name}</strong>{" "}
             {hardware?.cuda_available ? `(${hardware.vram_total_gb} GB VRAM)` : "(CPU mode)"} • RAM: {hardware?.ram_total_gb} GB • Free Disk: {hardware?.disk_free_gb} GB
@@ -72,7 +72,7 @@ export function FirstRunWizard() {
           {models.map((m) => (
             <div
               key={m.model_id}
-              className="rounded-xl bg-[#1c1c22] border border-[#2a2a34] p-3.5 flex items-center justify-between gap-4"
+              className="rounded-xl bg-[#191c26] border border-[#2a2a34] p-3.5 flex items-center justify-between gap-4"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export function FirstRunWizard() {
                 <button
                   onClick={() => startDownload(m.model_id)}
                   disabled={downloadingId !== null}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50 shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#e5a95e] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50 shrink-0"
                 >
                   <Download className="w-3.5 h-3.5" />
                   {downloadingId === m.model_id ? "Downloading..." : "Download"}
@@ -106,7 +106,7 @@ export function FirstRunWizard() {
           ))}
         </div>
 
-        {statusMsg && <div className="text-xs text-[#d4a373]">{statusMsg}</div>}
+        {statusMsg && <div className="text-xs text-[#e5a95e]">{statusMsg}</div>}
 
         <div className="flex justify-end gap-3 pt-2 border-t border-[#262630]">
           <button

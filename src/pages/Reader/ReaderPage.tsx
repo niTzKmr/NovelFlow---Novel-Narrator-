@@ -86,9 +86,9 @@ export function ReaderPage() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#0f0f12]">
+    <div className="h-full flex flex-col bg-[#0b0c10]">
       {/* Restrained Distraction-Free Top Reader Toolbar */}
-      <header className="h-12 shrink-0 bg-[#141418] border-b border-[#24242e] px-4 flex items-center justify-between gap-3 select-none relative">
+      <header className="h-12 shrink-0 bg-[#101218] border-b border-[#222634] px-4 flex items-center justify-between gap-3 select-none relative">
         <div className="flex items-center gap-2 min-w-0">
           {!isFullscreen && (
             <button
@@ -101,7 +101,7 @@ export function ReaderPage() {
           )}
           <button
             onClick={() => setShowSidebar((s) => !s)}
-            className={`p-1.5 rounded-lg ${showSidebar ? "bg-[#24242e] text-[#d4a373]" : "text-[#9d9daa] hover:text-white"}`}
+            className={`p-1.5 rounded-lg ${showSidebar ? "bg-[#222634] text-[#e5a95e]" : "text-[#9d9daa] hover:text-white"}`}
             title="Toggle Chapters & Annotations"
           >
             <PanelLeft className="w-4 h-4" />
@@ -135,7 +135,7 @@ export function ReaderPage() {
 
           <button
             onClick={() => setRenderMode((m) => (m === "epubjs" ? "clean" : "epubjs"))}
-            className="px-2.5 py-1 rounded-lg bg-[#1d1d24] border border-[#2b2b36] text-[11px] text-[#b4b4c2] hover:text-white"
+            className="px-2.5 py-1 rounded-lg bg-[#181b24] border border-[#2b2b36] text-[11px] text-[#b4b4c2] hover:text-white"
             title="Switch between EPUB.js layout and Clean Prose Sync layout"
           >
             {renderMode === "epubjs" ? "EPUB View" : "Prose Sync"}
@@ -143,7 +143,7 @@ export function ReaderPage() {
 
           <button
             onClick={() => startNarration(activeSentenceIndex ?? 0)}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#e5a95e] text-[#141210] text-xs font-semibold hover:brightness-105"
           >
             <Headphones className="w-3.5 h-3.5" />
             Narrate
@@ -151,7 +151,7 @@ export function ReaderPage() {
 
           <button
             onClick={() => handleBookmark()}
-            className="p-1.5 rounded-lg text-[#9d9daa] hover:text-[#d4a373] hover:bg-[#22222c]"
+            className="p-1.5 rounded-lg text-[#9d9daa] hover:text-[#e5a95e] hover:bg-[#22222c]"
             title="Bookmark Current Position"
           >
             <Bookmark className="w-4 h-4" />
@@ -159,7 +159,7 @@ export function ReaderPage() {
 
           <button
             onClick={() => setShowTypography((s) => !s)}
-            className={`p-1.5 rounded-lg ${showTypography ? "bg-[#24242e] text-[#d4a373]" : "text-[#9d9daa] hover:text-white"}`}
+            className={`p-1.5 rounded-lg ${showTypography ? "bg-[#222634] text-[#e5a95e]" : "text-[#9d9daa] hover:text-white"}`}
             title="Typography & Theme"
           >
             <Type className="w-4 h-4" />

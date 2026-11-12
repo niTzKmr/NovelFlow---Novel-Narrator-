@@ -18,26 +18,26 @@ export function BookCard({ book, layout = "grid", onOpen, onToggleFavorite, onDe
     return (
       <div
         onClick={() => onOpen(book.book_id)}
-        className="group flex items-center gap-4 p-3 rounded-xl bg-[#16161b] border border-[#25252f] hover:border-[#d4a373]/45 transition-all cursor-pointer"
+        className="group flex items-center gap-4 p-3 rounded-xl bg-[#13151c] border border-[#252a38] hover:border-[#e5a95e]/50 hover:bg-[#171a23] transition-all cursor-pointer"
       >
-        <div className="w-12 h-16 rounded-lg overflow-hidden bg-[#22222b] shrink-0 flex items-center justify-center border border-[#2f2f3c]">
+        <div className="w-12 h-16 rounded-lg overflow-hidden bg-[#1b1e28] shrink-0 flex items-center justify-center border border-[#2b3040]">
           {coverSrc ? (
             <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
           ) : (
-            <BookOpen className="w-5 h-5 text-[#777785]" />
+            <BookOpen className="w-5 h-5 text-[#778096]" />
           )}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-[#f1f1f4] truncate">{book.title}</h3>
+            <h3 className="text-sm font-semibold text-[#f5f5f7] truncate">{book.title}</h3>
             {book.collection_name && (
-              <span className="text-[10.5px] px-2 py-0.5 rounded-full bg-[#24242d] text-[#b0b0be]">
+              <span className="text-[10.5px] px-2 py-0.5 rounded-full bg-[#1f2330] text-[#b4bbd0]">
                 {book.collection_name}
               </span>
             )}
           </div>
-          <p className="text-xs text-[#8d8d9b] truncate">{book.author}</p>
-          <div className="flex items-center gap-4 mt-1.5 text-[11px] text-[#7c7c8a]">
+          <p className="text-xs text-[#9198ad] truncate">{book.author}</p>
+          <div className="flex items-center gap-4 mt-1.5 text-[11px] text-[#7c8398]">
             <span>Read: {book.reading_progress_pct}%</span>
             <span>Listen: {book.listening_progress_pct}%</span>
             <span>{book.total_chapters} chapters</span>
@@ -47,10 +47,10 @@ export function BookCard({ book, layout = "grid", onOpen, onToggleFavorite, onDe
         <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => onToggleFavorite(book)}
-            className="p-2 rounded-lg hover:bg-[#23232c] text-[#8d8d9b] hover:text-[#d4a373]"
+            className="p-2 rounded-lg hover:bg-[#222634] text-[#8d94a8] hover:text-[#e5a95e]"
             title="Toggle Favorite"
           >
-            <Star className={`w-4 h-4 ${book.is_favorite ? "fill-[#d4a373] text-[#d4a373]" : ""}`} />
+            <Star className={`w-4 h-4 ${book.is_favorite ? "fill-[#e5a95e] text-[#e5a95e]" : ""}`} />
           </button>
           {onDelete && (
             <button
@@ -69,15 +69,15 @@ export function BookCard({ book, layout = "grid", onOpen, onToggleFavorite, onDe
   return (
     <div
       onClick={() => onOpen(book.book_id)}
-      className="group rounded-xl bg-[#16161b] border border-[#25252f] hover:border-[#d4a373]/45 p-3.5 transition-all cursor-pointer flex flex-col"
+      className="group rounded-xl bg-[#13151c] border border-[#252a38] hover:border-[#e5a95e]/50 hover:bg-[#171a23] p-3.5 transition-all cursor-pointer flex flex-col shadow-sm"
     >
-      <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden bg-gradient-to-b from-[#23232c] to-[#17171d] border border-[#2b2b36] mb-3 flex items-center justify-center">
+      <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden bg-gradient-to-b from-[#1e222f] to-[#13151c] border border-[#2a2f3e] mb-3 flex items-center justify-center">
         {coverSrc ? (
-          <img src={coverSrc} alt={book.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
+          <img src={coverSrc} alt={book.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
         ) : (
           <div className="p-4 text-center">
-            <BookOpen className="w-7 h-7 text-[#d4a373]/70 mx-auto mb-2" />
-            <div className="text-xs font-serif text-[#d5d5de] line-clamp-3">{book.title}</div>
+            <BookOpen className="w-7 h-7 text-[#e5a95e]/75 mx-auto mb-2" />
+            <div className="text-xs font-serif text-[#d7dbe8] line-clamp-3">{book.title}</div>
           </div>
         )}
         <button
@@ -85,14 +85,14 @@ export function BookCard({ book, layout = "grid", onOpen, onToggleFavorite, onDe
             e.stopPropagation();
             onToggleFavorite(book);
           }}
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-black/55 backdrop-blur-sm text-white/80 hover:text-[#d4a373]"
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white/80 hover:text-[#e5a95e]"
           title="Favorite"
         >
-          <Star className={`w-3.5 h-3.5 ${book.is_favorite ? "fill-[#d4a373] text-[#d4a373]" : ""}`} />
+          <Star className={`w-3.5 h-3.5 ${book.is_favorite ? "fill-[#e5a95e] text-[#e5a95e]" : ""}`} />
         </button>
       </div>
 
-      <h3 className="text-[13.5px] font-semibold text-[#f1f1f4] line-clamp-1">{book.title}</h3>
+      <h3 className="text-[13.5px] font-semibold text-[#f5f5f7] line-clamp-1">{book.title}</h3>
       <p className="text-xs text-[#8d8d9b] line-clamp-1 mt-0.5">{book.author}</p>
 
       <div className="mt-3 pt-2.5 border-t border-[#22222b] space-y-1.5">

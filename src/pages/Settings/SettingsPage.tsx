@@ -1,14 +1,12 @@
-import { AudioLines, Cpu, Download, HardDrive, Loader2, Mic2, Shield, Sliders, Trash2 } from "lucide-react";
+import { Cpu, Download, HardDrive, Loader2, Mic2, Shield, Sliders, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 import { useAppStore } from "../../store/useAppStore";
-import { useTtsStudioStore } from "../../store/useTtsStudioStore";
 import type { StorageStats } from "../../types";
 
 export function SettingsPage() {
   const { settings, models, voices, hardware, updateAppSettings, updateReaderPrefs, refreshBooks, refreshModelsAndVoices, setErrorToast } =
     useAppStore();
-  const { enabled: studioEnabled, setEnabledFlag: setStudioEnabled } = useTtsStudioStore();
 
   const [storage, setStorage] = useState<StorageStats | null>(null);
   const [msg, setMsg] = useState("");
@@ -61,13 +59,13 @@ export function SettingsPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-[#f4f4f7]">Settings</h1>
           <p className="text-sm text-[#8e8e9c] mt-0.5">Configure local AI inference, voice defaults, storage cache, and privacy.</p>
         </div>
-        {msg && <span className="text-xs text-[#d4a373] font-medium">{msg}</span>}
+        {msg && <span className="text-xs text-[#e5a95e] font-medium">{msg}</span>}
       </div>
 
       {/* GENERAL */}
-      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+      <section className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#f1f1f4]">
-          <Sliders className="w-4 h-4 text-[#d4a373]" />
+          <Sliders className="w-4 h-4 text-[#e5a95e]" />
           <span>General</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -76,7 +74,7 @@ export function SettingsPage() {
             <select
               value={settings.reader.theme}
               onChange={(e) => updateReaderPrefs({ theme: e.target.value as typeof settings.reader.theme })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               <option value="charcoal">Warm Charcoal</option>
               <option value="dark">Pure Dark</option>
@@ -90,7 +88,7 @@ export function SettingsPage() {
             <select
               value={settings.startup_behavior}
               onChange={(e) => updateAppSettings({ startup_behavior: e.target.value })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               <option value="home">Home Dashboard</option>
               <option value="library">Book Library</option>
@@ -101,7 +99,7 @@ export function SettingsPage() {
             <select
               value={settings.language}
               onChange={(e) => updateAppSettings({ language: e.target.value })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               <option value="English">English</option>
               <option value="Auto">Auto Multilingual</option>
@@ -111,9 +109,9 @@ export function SettingsPage() {
       </section>
 
       {/* AI VOICE */}
-      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+      <section className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#f1f1f4]">
-          <Mic2 className="w-4 h-4 text-[#d4a373]" />
+          <Mic2 className="w-4 h-4 text-[#e5a95e]" />
           <span>AI Voice</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -122,7 +120,7 @@ export function SettingsPage() {
             <select
               value={settings.active_model_id}
               onChange={(e) => updateAppSettings({ active_model_id: e.target.value })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               {models.map((m) => (
                 <option key={m.model_id} value={m.model_id}>
@@ -154,7 +152,7 @@ export function SettingsPage() {
                         setErrorToast(err instanceof Error ? err.message : String(err));
                       }
                     }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#d4a373] text-[#141210] font-semibold shrink-0 disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#e5a95e] text-[#141210] font-semibold shrink-0 disabled:opacity-60"
                   >
                     {isBusy ? (
                       <>
@@ -179,7 +177,7 @@ export function SettingsPage() {
                 await updateAppSettings({ preferred_voice_id: e.target.value });
                 await refreshModelsAndVoices();
               }}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               {voices.map((v) => (
                 <option key={v.voice_id} value={v.voice_id}>
@@ -192,12 +190,12 @@ export function SettingsPage() {
       </section>
 
       {/* PERFORMANCE */}
-      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+      <section className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#f1f1f4]">
-          <Cpu className="w-4 h-4 text-[#d4a373]" />
+          <Cpu className="w-4 h-4 text-[#e5a95e]" />
           <span>Performance & Hardware</span>
         </div>
-        <div className="text-xs text-[#9b9ba8] bg-[#1c1c23] border border-[#282834] rounded-xl p-3">
+        <div className="text-xs text-[#9b9ba8] bg-[#191c26] border border-[#282834] rounded-xl p-3">
           {hardware?.cuda_available
             ? `Detected ${hardware.gpu_name} (${hardware.vram_total_gb} GB VRAM, ${hardware.vram_free_gb} GB free, bf16=${hardware.bf16_supported}) • ${hardware.ram_total_gb} GB System RAM`
             : `CPU Mode: ${hardware?.cpu_name} • ${hardware?.ram_total_gb} GB RAM`}
@@ -208,7 +206,7 @@ export function SettingsPage() {
             <select
               value={settings.device_preference}
               onChange={(e) => updateAppSettings({ device_preference: e.target.value })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               <option value="auto">Auto (VRAM Guarded)</option>
               <option value="cuda">Force CUDA GPU</option>
@@ -220,7 +218,7 @@ export function SettingsPage() {
             <select
               value={settings.batch_size}
               onChange={(e) => updateAppSettings({ batch_size: Number(e.target.value) })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               <option value={1}>1 sentence (4 GB VRAM Safe)</option>
               <option value={2}>2 sentences (~3.5 GB VRAM)</option>
@@ -232,7 +230,7 @@ export function SettingsPage() {
             <select
               value={settings.audio_cache_format}
               onChange={(e) => updateAppSettings({ audio_cache_format: e.target.value })}
-              className="w-full bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
             >
               <option value="wav">Lossless WAV (Instant)</option>
               <option value="mp3">Compressed MP3 (FFmpeg)</option>
@@ -246,32 +244,32 @@ export function SettingsPage() {
             type="checkbox"
             checked={settings.pregenerate_next_chapter}
             onChange={(e) => updateAppSettings({ pregenerate_next_chapter: e.target.checked })}
-            className="accent-[#d4a373]"
+            className="accent-[#e5a95e]"
           />
         </label>
       </section>
 
       {/* STORAGE */}
-      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+      <section className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#f1f1f4]">
-          <HardDrive className="w-4 h-4 text-[#d4a373]" />
+          <HardDrive className="w-4 h-4 text-[#e5a95e]" />
           <span>Storage & Cache</span>
         </div>
         {storage && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="bg-[#1c1c23] border border-[#282834] rounded-xl p-3">
+            <div className="bg-[#191c26] border border-[#282834] rounded-xl p-3">
               <div className="text-[#8d8d9b]">Books ({storage.book_count})</div>
               <div className="text-sm font-semibold text-white mt-0.5">{storage.books_mb} MB</div>
             </div>
-            <div className="bg-[#1c1c23] border border-[#282834] rounded-xl p-3">
+            <div className="bg-[#191c26] border border-[#282834] rounded-xl p-3">
               <div className="text-[#8d8d9b]">Audio Cache ({storage.cached_chunk_count})</div>
               <div className="text-sm font-semibold text-white mt-0.5">{storage.audio_cache_mb} MB</div>
             </div>
-            <div className="bg-[#1c1c23] border border-[#282834] rounded-xl p-3">
+            <div className="bg-[#191c26] border border-[#282834] rounded-xl p-3">
               <div className="text-[#8d8d9b]">Voice Refs</div>
               <div className="text-sm font-semibold text-white mt-0.5">{storage.voices_mb} MB</div>
             </div>
-            <div className="bg-[#1c1c23] border border-[#282834] rounded-xl p-3">
+            <div className="bg-[#191c26] border border-[#282834] rounded-xl p-3">
               <div className="text-[#8d8d9b]">Local Models</div>
               <div className="text-sm font-semibold text-white mt-0.5">{storage.models_gb} GB</div>
             </div>
@@ -286,7 +284,7 @@ export function SettingsPage() {
               max={200}
               value={settings.max_cache_gb}
               onChange={(e) => updateAppSettings({ max_cache_gb: Number(e.target.value) })}
-              className="w-20 bg-[#1e1e26] border border-[#2c2c38] rounded-lg px-2.5 py-1 text-white"
+              className="w-20 bg-[#1b1e28] border border-[#2b3040] rounded-lg px-2.5 py-1 text-white"
             />
           </div>
           <button
@@ -295,7 +293,7 @@ export function SettingsPage() {
               setMsg(`Removed ${res.removed_files} cached audio chunks.`);
               await loadStorage();
             }}
-            className="px-3 py-1.5 rounded-xl bg-[#22222c] border border-[#2f2f3c] hover:border-[#d4a373]/50"
+            className="px-3 py-1.5 rounded-xl bg-[#22222c] border border-[#2f2f3c] hover:border-[#e5a95e]/50"
           >
             Clear Generated Audio Cache
           </button>
@@ -305,7 +303,7 @@ export function SettingsPage() {
               setMsg("Cleared temporary cache.");
               await loadStorage();
             }}
-            className="px-3 py-1.5 rounded-xl bg-[#22222c] border border-[#2f2f3c] hover:border-[#d4a373]/50"
+            className="px-3 py-1.5 rounded-xl bg-[#22222c] border border-[#2f2f3c] hover:border-[#e5a95e]/50"
           >
             Clear Temporary Files
           </button>
@@ -320,7 +318,7 @@ export function SettingsPage() {
       </section>
 
       {/* PRIVACY */}
-      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-4">
+      <section className="rounded-2xl bg-[#13151c] border border-[#252a38] p-5 space-y-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#f1f1f4]">
           <Shield className="w-4 h-4 text-emerald-400" />
           <span>Privacy & Voice References</span>
@@ -332,7 +330,7 @@ export function SettingsPage() {
               type="checkbox"
               checked={settings.local_only_mode}
               onChange={(e) => updateAppSettings({ local_only_mode: e.target.checked })}
-              className="accent-[#d4a373]"
+              className="accent-[#e5a95e]"
             />
           </label>
           <label className="flex items-center justify-between">
@@ -341,7 +339,7 @@ export function SettingsPage() {
               type="checkbox"
               checked={settings.telemetry_enabled}
               onChange={(e) => updateAppSettings({ telemetry_enabled: e.target.checked })}
-              className="accent-[#d4a373]"
+              className="accent-[#e5a95e]"
             />
           </label>
         </div>
@@ -350,7 +348,7 @@ export function SettingsPage() {
           <div className="space-y-2 pt-2 border-t border-[#24242f]">
             <div className="text-xs font-medium text-[#b5b5c3]">Imported Voice References</div>
             {clonedVoices.map((v) => (
-              <div key={v.voice_id} className="flex items-center justify-between bg-[#1c1c23] px-3 py-2 rounded-lg text-xs">
+              <div key={v.voice_id} className="flex items-center justify-between bg-[#191c26] px-3 py-2 rounded-lg text-xs">
                 <span>{v.name}</span>
                 <button
                   onClick={async () => {
@@ -366,13 +364,13 @@ export function SettingsPage() {
           </div>
         )}
 
-        <div className="pt-3 border-t border-[#262632] flex flex-wrap items-center gap-2.5 text-xs">
+        <div className="pt-3 border-t border-[#252a38] flex flex-wrap items-center gap-2.5 text-xs">
           <input
             type="text"
             value={wipeConfirm}
             onChange={(e) => setWipeConfirm(e.target.value)}
             placeholder="Type DELETE ALL to wipe books & custom voices"
-            className="flex-1 min-w-[240px] bg-[#1e1e26] border border-[#2c2c38] rounded-xl px-3 py-2 text-white"
+            className="flex-1 min-w-[240px] bg-[#1b1e28] border border-[#2b3040] rounded-xl px-3 py-2 text-white"
           />
           <button
             onClick={async () => {
@@ -391,31 +389,6 @@ export function SettingsPage() {
           >
             Delete All Application Data
           </button>
-        </div>
-      </section>
-
-      {/* TEXT TO SPEECH STUDIO FEATURE FLAG */}
-      <section className="rounded-2xl bg-[#16161b] border border-[#25252f] p-5 space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <AudioLines className="w-4 h-4 text-[#d4a373]" />
-            <div>
-              <div className="text-sm font-semibold text-[#f1f1f4]">Text-to-Speech Studio (Standalone)</div>
-              <p className="text-xs text-[#8d8d9b] mt-0.5">
-                Show Text to Speech in the sidebar to synthesize arbitrary text locally without affecting your EPUB library or audiobook cache.
-              </p>
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            checked={studioEnabled}
-            onChange={(e) => {
-              void setStudioEnabled(e.target.checked).catch((err) =>
-                setErrorToast(err instanceof Error ? err.message : String(err))
-              );
-            }}
-            className="accent-[#d4a373]"
-          />
         </div>
       </section>
     </div>

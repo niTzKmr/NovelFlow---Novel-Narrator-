@@ -1,4 +1,4 @@
-export type PageId = "home" | "library" | "reader" | "voicelab" | "tts" | "settings";
+export type PageId = "home" | "library" | "reader" | "voicelab" | "settings";
 
 export interface ModelCompatibility {
   fits_dedicated_vram: boolean;

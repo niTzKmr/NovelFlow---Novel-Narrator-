@@ -174,13 +174,27 @@ function stopBackendProcess(): void {
 }
 
 function createWindow(pageFile: "index.html" | "setup.html" = "index.html"): void {
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, "icon.ico")
+    : path.join(__dirname, "..", "build", "icon.ico");
+
   mainWindow = new BrowserWindow({
     width: 1420,
     height: 900,
     minWidth: 1080,
     minHeight: 700,
     title: "NovelFlow",
-    backgroundColor: "#0f0f12",
+    icon: fs.existsSync(iconPath) ? iconPath : undefined,
+    backgroundColor: "#0B0C10",
+    titleBarStyle: process.platform === "win32" ? "hidden" : "default",
+    titleBarOverlay:
+      process.platform === "win32"
+        ? {
+            color: "#0B0C10",
+            symbolColor: "#9CA3B8",
+            height: 34,
+          }
+        : undefined,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -264,39 +278,60 @@ function sendSetupProgress(payload: { stage?: string; percent?: number; log?: st
   mainWindow?.webContents.send("setup:progress", payload);
 }
 
-function runSetupStep(exe: string, args: string[], env: NodeJS.ProcessEnv): Promise<void> {
+function runSetupStep(
+  exe: string,
+  args: string[],
+  env: NodeJS.ProcessEnv,
+  startPct?: number,
+  endPct?: number,
+  stageLabel?: string
+): Promise<void> {
   return new Promise((resolve, reject) => {
     if (setupCanceled) {
       reject(new Error("Setup canceled by user."));
       return;
     }
+    const setupLog = path.join(app.getPath("userData"), "novelflow-setup.log");
+    fs.mkdirSync(path.dirname(setupLog), { recursive: true });
     const child = spawn(exe, args, {
       env,
       windowsHide: true,
       stdio: ["ignore", "pipe", "pipe"],
     });
     setupChild = child;
+
+    let currentPct = startPct ?? 0;
+    const pulse =
+      typeof startPct === "number" && typeof endPct === "number" && endPct > startPct
+        ? setInterval(() => {
+            currentPct = Math.min(endPct - 1, currentPct + (endPct - currentPct) * 0.06);
+            sendSetupProgress({ stage: stageLabel, percent: currentPct });
+          }, 1200)
+        : null;
+
     const onData = (chunk: Buffer) => {
-      const lines = chunk.toString("utf8").split(/\r?\n/);
-      for (const ln of lines) {
-        const clean = ln.trim();
-        if (clean) sendSetupProgress({ log: clean });
+      try {
+        fs.appendFileSync(setupLog, chunk);
+      } catch {
+        // ignore log write failure
       }
     };
     child.stdout?.on("data", onData);
     child.stderr?.on("data", onData);
     child.on("error", (err) => {
+      if (pulse) clearInterval(pulse);
       setupChild = null;
       reject(err);
     });
     child.on("close", (code) => {
+      if (pulse) clearInterval(pulse);
       setupChild = null;
       if (setupCanceled) {
         reject(new Error("Setup canceled by user."));
       } else if (code === 0) {
         resolve();
       } else {
-        reject(new Error(`Installer command exited with code ${code}`));
+        reject(new Error(`Resource download step failed (code ${code}). Check your internet connection and retry.`));
       }
     });
   });
@@ -373,7 +408,7 @@ ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu", downloadDefault
       fs.unlinkSync(aiEnvMarker);
     }
 
-    sendSetupProgress({ stage: "Preparing isolated Python 3.12 runtime...", percent: 8, log: `Target: ${aiEnvDir}` });
+    sendSetupProgress({ stage: "Preparing local runtime...", percent: 8 });
     fs.mkdirSync(aiEnvDir, { recursive: true });
     fs.cpSync(pythonBaseDir, aiEnvDir, { recursive: true, force: true });
 
@@ -384,31 +419,33 @@ ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu", downloadDefault
       PIP_NO_INPUT: "1",
     };
 
-    sendSetupProgress({ stage: "Bootstrapping offline package installer (pip)...", percent: 18 });
+    sendSetupProgress({ stage: "Initializing package manager...", percent: 14 });
     await runSetupStep(aiEnvPython, ["-s", "-m", "ensurepip", "--default-pip"], pipEnv);
 
     const torchIndex =
       mode === "cuda" ? "https://download.pytorch.org/whl/cu128" : "https://download.pytorch.org/whl/cpu";
-    sendSetupProgress({
-      stage: mode === "cuda" ? "Downloading PyTorch CUDA 12.8 (~2.6 GB)..." : "Downloading PyTorch CPU (~280 MB)...",
-      percent: 32,
-      log: `Installing torch & torchaudio from ${torchIndex}`,
-    });
+    const torchStage =
+      mode === "cuda" ? "Downloading PyTorch CUDA engine..." : "Downloading PyTorch CPU engine...";
+    sendSetupProgress({ stage: torchStage, percent: 20 });
     await runSetupStep(
       aiEnvPython,
       ["-s", "-m", "pip", "install", "--no-cache-dir", "--upgrade", "torch==2.11.0", "torchaudio==2.11.0", "--index-url", torchIndex],
-      pipEnv
+      pipEnv,
+      20,
+      54,
+      torchStage
     );
 
-    sendSetupProgress({ stage: "Downloading Qwen3-TTS, FasterQwen3TTS & FastAPI backend...", percent: 72 });
+    const ttsStage = "Downloading Qwen3-TTS & audio modules...";
+    sendSetupProgress({ stage: ttsStage, percent: 55 });
     const reqArgs = ["-s", "-m", "pip", "install", "--no-cache-dir"];
     if (mode === "cuda") {
       reqArgs.push("--extra-index-url", "https://download.pytorch.org/whl/cu128");
     }
     reqArgs.push("-r", reqFile);
-    await runSetupStep(aiEnvPython, reqArgs, pipEnv);
+    await runSetupStep(aiEnvPython, reqArgs, pipEnv, 55, 76, ttsStage);
 
-    sendSetupProgress({ stage: "Verifying installed AI packages...", percent: 76 });
+    sendSetupProgress({ stage: "Verifying voice runtime...", percent: 77 });
     await runSetupStep(
       aiEnvPython,
       ["-s", "-c", "import torch, faster_qwen3_tts, qwen_tts, fastapi, uvicorn, soundfile, imageio_ffmpeg; print('OK')"],
@@ -421,11 +458,8 @@ ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu", downloadDefault
       const hfCache = path.join(projectRoot, "models", "hf_cache");
       fs.mkdirSync(modelTarget, { recursive: true });
       fs.mkdirSync(hfCache, { recursive: true });
-      sendSetupProgress({
-        stage: "Downloading default Qwen3-TTS-12Hz-0.6B-Base voice model (~2.34 GB)...",
-        percent: 82,
-        log: `Downloading into ${modelTarget}`,
-      });
+      const modelStage = "Downloading narrator voice model (Qwen3-TTS 0.6B)...";
+      sendSetupProgress({ stage: modelStage, percent: 80 });
       await runSetupStep(
         aiEnvPython,
         [
@@ -433,7 +467,10 @@ ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu", downloadDefault
           "-c",
           "import os; from huggingface_hub import snapshot_download; snapshot_download(repo_id='Qwen/Qwen3-TTS-12Hz-0.6B-Base', local_dir=os.environ['NF_MODEL_DIR'])",
         ],
-        { ...pipEnv, HF_HOME: hfCache, HF_HUB_DISABLE_SYMLINKS_WARNING: "1", NF_MODEL_DIR: modelTarget }
+        { ...pipEnv, HF_HOME: hfCache, HF_HUB_DISABLE_SYMLINKS_WARNING: "1", NF_MODEL_DIR: modelTarget },
+        80,
+        95,
+        modelStage
       );
     }
 
@@ -441,7 +478,7 @@ ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu", downloadDefault
       aiEnvMarker,
       JSON.stringify({ mode, version: app.getVersion(), installedAt: new Date().toISOString() }, null, 2)
     );
-    sendSetupProgress({ stage: "Starting local NovelFlow AI engine...", percent: 96 });
+    sendSetupProgress({ stage: "Starting NovelFlow...", percent: 97 });
 
     await ensureBackendRunning();
     sendSetupProgress({ stage: "Ready!", percent: 100 });

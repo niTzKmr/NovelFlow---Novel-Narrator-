@@ -57,23 +57,25 @@ export function HomePage() {
     <div className="p-7 max-w-6xl mx-auto space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#f4f4f7]">Welcome back</h1>
-          <p className="text-sm text-[#8e8e9c] mt-0.5">
-            Active Narrator: <span className="text-[#d4a373] font-medium">{preferredVoice?.name || "Deep Cinematic Narrator"}</span> • 100% Local AI
+          <h1 className="text-2xl font-semibold tracking-tight text-[#f5f5f7]">Welcome back</h1>
+          <p className="text-sm text-[#959cb0] mt-0.5">
+            Active Narrator: <span className="text-[#e5a95e] font-medium">{preferredVoice?.name || "Deep Cinematic Narrator"}</span>{" "}
+            <span className="text-[#565d72]">•</span>{" "}
+            <span className="text-emerald-400/90">100% Offline AI</span>
           </p>
         </div>
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setPage("voicelab")}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#1a1a21] border border-[#2a2a35] text-xs font-medium text-[#e6e6ec] hover:border-[#d4a373]/50"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#161922] border border-[#272b3a] text-xs font-medium text-[#e6e8f0] hover:border-[#e5a95e]/55 hover:bg-[#1c202b] transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#d4a373]" />
+            <Sparkles className="w-3.5 h-3.5 text-[#e5a95e]" />
             Voice Lab
           </button>
           <button
             onClick={handleImport}
             disabled={importing}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105 disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e5a95e] text-[#13110e] text-xs font-semibold hover:bg-[#eeb973] shadow-md shadow-[#e5a95e]/10 disabled:opacity-50 transition-all"
           >
             <Plus className="w-4 h-4" />
             {importing ? "Importing..." : "Import EPUB"}
@@ -81,32 +83,49 @@ export function HomePage() {
         </div>
       </div>
 
-      {/* Hero Continue Reading */}
+      {/* Hero Continue Reading with Cover-Adaptive Ambient Glow */}
       {heroBook ? (
-        <div className="rounded-2xl bg-gradient-to-br from-[#191920] to-[#131317] border border-[#282834] p-6 flex flex-col sm:flex-row gap-6 items-center">
-          <div className="w-28 h-40 rounded-xl overflow-hidden bg-[#22222b] border border-[#2f2f3d] shrink-0 flex items-center justify-center">
+        <div className="relative overflow-hidden rounded-2xl bg-[#13151c] border border-[#272b3a] p-6 flex flex-col sm:flex-row gap-6 items-center shadow-xl">
+          {heroBook.cover_url && (
+            <img
+              src={resolveBackendUrl(heroBook.cover_url)}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-20 blur-2xl scale-110"
+            />
+          )}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(110deg, rgba(19,21,28,0.88) 0%, rgba(19,21,28,0.94) 55%, rgba(13,15,21,0.97) 100%)",
+            }}
+          />
+
+          <div className="relative z-10 w-28 h-40 rounded-xl overflow-hidden bg-[#1d202b] border border-[#32374a] shrink-0 flex items-center justify-center shadow-lg">
             {heroBook.cover_url ? (
               <img src={resolveBackendUrl(heroBook.cover_url)} alt={heroBook.title} className="w-full h-full object-cover" />
             ) : (
-              <BookOpen className="w-8 h-8 text-[#d4a373]/70" />
+              <BookOpen className="w-8 h-8 text-[#e5a95e]/80" />
             )}
           </div>
-          <div className="flex-1 min-w-0 space-y-3">
-            <div className="text-[11px] uppercase tracking-wider text-[#d4a373] font-semibold">
+          <div className="relative z-10 flex-1 min-w-0 space-y-3">
+            <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-wider text-[#e5a95e] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               {heroBook.last_opened_at ? "Continue Reading" : "Ready in Library"}
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-[#f3f3f7] truncate">{heroBook.title}</h2>
-              <p className="text-sm text-[#9595a3]">{heroBook.author} • {heroBook.total_chapters} chapters</p>
+              <h2 className="text-xl font-semibold text-[#f5f5f7] truncate">{heroBook.title}</h2>
+              <p className="text-sm text-[#9ea5b8]">{heroBook.author} • {heroBook.total_chapters} chapters</p>
             </div>
-            <div className="max-w-md space-y-1">
-              <div className="h-1.5 w-full rounded-full bg-[#24242e] overflow-hidden">
+            <div className="max-w-md space-y-1.5">
+              <div className="h-1.5 w-full rounded-full bg-[#242836] overflow-hidden">
                 <div
-                  className="h-full bg-[#d4a373] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#d49449] to-[#e5a95e] rounded-full"
                   style={{ width: `${Math.max(heroBook.reading_progress_pct, heroBook.listening_progress_pct)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[11px] text-[#848494]">
+              <div className="flex justify-between text-[11px] text-[#8890a4]">
                 <span>Reading: {heroBook.reading_progress_pct}%</span>
                 <span>Listening: {heroBook.listening_progress_pct}%</span>
               </div>
@@ -114,14 +133,14 @@ export function HomePage() {
             <div className="flex items-center gap-3 pt-1">
               <button
                 onClick={() => openBook(heroBook.book_id)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e5a95e] text-[#13110e] text-xs font-semibold hover:bg-[#eeb973] shadow-md shadow-[#e5a95e]/15 transition-all"
               >
                 <Headphones className="w-3.5 h-3.5" />
-                Open Reader & Narrator
+                Open Reader &amp; Narrator
               </button>
               <button
                 onClick={() => setPage("library")}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#21212a] text-xs text-[#d6d6e0] hover:text-white"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1b1e29] border border-[#2a2f40] text-xs text-[#dce0eb] hover:text-white hover:border-[#3c4359]"
               >
                 All Books <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -129,15 +148,15 @@ export function HomePage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-2xl bg-[#16161b] border border-dashed border-[#2f2f3c] p-10 text-center space-y-3">
-          <BookOpen className="w-10 h-10 text-[#d4a373]/80 mx-auto" />
-          <h2 className="text-lg font-medium text-[#f1f1f4]">Your local library is ready</h2>
-          <p className="text-sm text-[#8f8f9e] max-w-md mx-auto">
+        <div className="rounded-2xl bg-[#13151c] border border-dashed border-[#2b3040] p-10 text-center space-y-3">
+          <BookOpen className="w-10 h-10 text-[#e5a95e]/85 mx-auto" />
+          <h2 className="text-lg font-medium text-[#f5f5f7]">Your local library is ready</h2>
+          <p className="text-sm text-[#959cb0] max-w-md mx-auto">
             Import any EPUB 2 or EPUB 3 novel to read distraction-free and generate unlimited offline AI narration.
           </p>
           <button
             onClick={handleImport}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#d4a373] text-[#141210] text-xs font-semibold hover:brightness-105"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e5a95e] text-[#13110e] text-xs font-semibold hover:bg-[#eeb973] transition-all"
           >
             <Plus className="w-4 h-4" />
             Import Your First EPUB
