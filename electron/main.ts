@@ -360,7 +360,7 @@ ipcMain.handle("setup:cancel", async () => {
   return { canceled: true };
 });
 
-ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu") => {
+ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu", downloadDefaultModel = true) => {
   setupCanceled = false;
   const { aiEnvDir, aiEnvPython, aiEnvMarker, pythonBaseDir } = getAiEnvPaths();
   const reqFile = path.join(process.resourcesPath, "backend", "requirements.txt");
@@ -408,12 +408,34 @@ ipcMain.handle("setup:start", async (_evt, mode: "cuda" | "cpu") => {
     reqArgs.push("-r", reqFile);
     await runSetupStep(aiEnvPython, reqArgs, pipEnv);
 
-    sendSetupProgress({ stage: "Verifying installed AI packages...", percent: 90 });
+    sendSetupProgress({ stage: "Verifying installed AI packages...", percent: 76 });
     await runSetupStep(
       aiEnvPython,
       ["-s", "-c", "import torch, faster_qwen3_tts, qwen_tts, fastapi, uvicorn, soundfile, imageio_ffmpeg; print('OK')"],
       pipEnv
     );
+
+    if (downloadDefaultModel !== false) {
+      const { projectRoot } = resolveBackendPaths();
+      const modelTarget = path.join(projectRoot, "models", "Qwen3-TTS-12Hz-0.6B-Base");
+      const hfCache = path.join(projectRoot, "models", "hf_cache");
+      fs.mkdirSync(modelTarget, { recursive: true });
+      fs.mkdirSync(hfCache, { recursive: true });
+      sendSetupProgress({
+        stage: "Downloading default Qwen3-TTS-12Hz-0.6B-Base voice model (~2.34 GB)...",
+        percent: 82,
+        log: `Downloading into ${modelTarget}`,
+      });
+      await runSetupStep(
+        aiEnvPython,
+        [
+          "-s",
+          "-c",
+          "import os; from huggingface_hub import snapshot_download; snapshot_download(repo_id='Qwen/Qwen3-TTS-12Hz-0.6B-Base', local_dir=os.environ['NF_MODEL_DIR'])",
+        ],
+        { ...pipEnv, HF_HOME: hfCache, HF_HUB_DISABLE_SYMLINKS_WARNING: "1", NF_MODEL_DIR: modelTarget }
+      );
+    }
 
     fs.writeFileSync(
       aiEnvMarker,

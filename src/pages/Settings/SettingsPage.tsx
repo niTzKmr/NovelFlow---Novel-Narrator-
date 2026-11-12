@@ -1,4 +1,4 @@
-import { AudioLines, Cpu, HardDrive, Mic2, Shield, Sliders, Trash2 } from "lucide-react";
+import { AudioLines, Cpu, Download, HardDrive, Loader2, Mic2, Shield, Sliders, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 import { useAppStore } from "../../store/useAppStore";
@@ -13,6 +13,7 @@ export function SettingsPage() {
   const [storage, setStorage] = useState<StorageStats | null>(null);
   const [msg, setMsg] = useState("");
   const [wipeConfirm, setWipeConfirm] = useState("");
+  const [downloadingModelId, setDownloadingModelId] = useState<string | null>(null);
 
   const loadStorage = async () => {
     try {
@@ -26,6 +27,28 @@ export function SettingsPage() {
   useEffect(() => {
     loadStorage();
   }, []);
+
+  useEffect(() => {
+    if (!downloadingModelId) return;
+    const t = window.setInterval(async () => {
+      try {
+        const st = await api.getDownloadStatus(downloadingModelId);
+        if (st.status === "completed") {
+          setDownloadingModelId(null);
+          setMsg("Voice model downloaded and ready!");
+          await refreshModelsAndVoices();
+          await loadStorage();
+        } else if (st.status === "failed") {
+          const err = st.error || "Model download failed";
+          setDownloadingModelId(null);
+          setErrorToast(err);
+        }
+      } catch {
+        // ignore transient poll error
+      }
+    }, 1500);
+    return () => window.clearInterval(t);
+  }, [downloadingModelId, refreshModelsAndVoices, setErrorToast]);
 
   if (!settings) return null;
 
@@ -107,6 +130,45 @@ export function SettingsPage() {
                 </option>
               ))}
             </select>
+            {(() => {
+              const curModel = models.find((m) => m.model_id === settings.active_model_id);
+              if (!curModel || curModel.is_downloaded) return null;
+              const isBusy = downloadingModelId === curModel.model_id;
+              return (
+                <div className="mt-2 flex items-center justify-between gap-2 rounded-xl bg-amber-500/10 border border-amber-400/30 px-3 py-2 text-[11.5px] text-amber-200">
+                  <span>Selected checkpoint is not downloaded yet ({curModel.disk_size_gb} GB).</span>
+                  <button
+                    disabled={downloadingModelId !== null}
+                    onClick={async () => {
+                      setDownloadingModelId(curModel.model_id);
+                      setMsg(`Downloading ${curModel.short_name}...`);
+                      try {
+                        const res = await api.downloadModel(curModel.model_id);
+                        if (res.status === "completed") {
+                          setDownloadingModelId(null);
+                          setMsg("Voice model downloaded and ready!");
+                          await refreshModelsAndVoices();
+                        }
+                      } catch (err) {
+                        setDownloadingModelId(null);
+                        setErrorToast(err instanceof Error ? err.message : String(err));
+                      }
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#d4a373] text-[#141210] font-semibold shrink-0 disabled:opacity-60"
+                  >
+                    {isBusy ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" /> Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-3 h-3" /> Download
+                      </>
+                    )}
+                  </button>
+                </div>
+              );
+            })()}
           </div>
           <div>
             <label className="block text-[#8d8d9b] mb-1.5">Default Narrator Profile</label>

@@ -384,9 +384,16 @@ export const useAppStore = create<AppState>((set, get) => {
       if (!activeChapter || !cfg) return;
       const targetSentence = startSentenceIndex ?? activeSentenceIndex ?? 0;
 
-      // Ensure voice/model compatibility cleanly before starting
+      // Ensure voice/model compatibility and local availability cleanly before starting
       const selectedModel = cfg.active_model_id;
       const selectedVoice = cfg.preferred_voice_id;
+      const modelObj = get().models.find((m) => m.model_id === selectedModel);
+      if (modelObj && !modelObj.is_downloaded) {
+        set({
+          errorToast: `Voice model "${modelObj.short_name}" is not downloaded yet. Open Settings or Voice Lab and click Download first.`,
+        });
+        return;
+      }
       const voiceObj = get().voices.find((v) => v.voice_id === selectedVoice);
       if (voiceObj && !voiceObj.compatible_models.includes(selectedModel)) {
         set({
@@ -441,6 +448,26 @@ export const useAppStore = create<AppState>((set, get) => {
               selectedModel
             );
             set({ audioStatus: updatedStatus });
+
+            if (res.job_id && !updatedStatus.complete) {
+              try {
+                const jobState = await api.getJobStatus(res.job_id);
+                if (jobState.status === "failed" || jobState.status === "cancelled") {
+                  stopPolling();
+                  set({
+                    activeJobId: null,
+                    isBuffering: false,
+                    isPlaying: false,
+                    errorToast:
+                      jobState.error_message ||
+                      `Audio generation ${jobState.status}. Check Settings or Voice Lab for model status.`,
+                  });
+                  return;
+                }
+              } catch {
+                // ignore transient poll hiccup
+              }
+            }
 
             if (get().isPlaying && get().isBuffering) {
               const idx = get().currentChunkIndex;

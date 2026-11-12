@@ -20,7 +20,8 @@ contextBridge.exposeInMainWorld("novelflow", {
     freeDiskGb: number;
     targetDir: string;
   }> => ipcRenderer.invoke("setup:getInfo"),
-  startAiSetup: (mode: "cuda" | "cpu"): Promise<{ ok: boolean }> => ipcRenderer.invoke("setup:start", mode),
+  startAiSetup: (mode: "cuda" | "cpu", downloadDefaultModel = true): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke("setup:start", mode, downloadDefaultModel),
   cancelAiSetup: (): Promise<{ canceled: boolean }> => ipcRenderer.invoke("setup:cancel"),
   onAiSetupProgress: (
     cb: (evt: { stage?: string; percent?: number; log?: string; error?: string }) => void

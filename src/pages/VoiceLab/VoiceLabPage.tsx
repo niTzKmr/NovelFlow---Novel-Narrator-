@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, Download, Mic2, Play, RotateCcw, Sparkles, Star, Trash2, Upload } from "lucide-react";
+import { AlertTriangle, Check, Download, Loader2, Mic2, Play, RotateCcw, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { api, resolveBackendUrl } from "../../services/api";
 import { useAppStore } from "../../store/useAppStore";
@@ -20,6 +20,7 @@ export function VoiceLabPage() {
   const [instructText, setInstructText] = useState("");
   const [samples, setSamples] = useState<LabSample[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [downloadingModelId, setDownloadingModelId] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState("Ready for offline Qwen3-TTS auditioning.");
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
 
@@ -35,6 +36,44 @@ export function VoiceLabPage() {
   const [cloneConsent, setCloneConsent] = useState(false);
   const [cloneFile, setCloneFile] = useState<File | { name: string; data: Uint8Array } | null>(null);
   const [creatingClone, setCreatingClone] = useState(false);
+
+  useEffect(() => {
+    if (!downloadingModelId) return;
+    const t = window.setInterval(async () => {
+      try {
+        const st = await api.getDownloadStatus(downloadingModelId);
+        if (st.status === "completed") {
+          setDownloadingModelId(null);
+          setStatusMsg("Model downloaded and ready locally!");
+          await refreshModelsAndVoices();
+        } else if (st.status === "failed") {
+          const err = st.error || "Download failed";
+          setDownloadingModelId(null);
+          setStatusMsg(`Download failed: ${err}`);
+          setErrorToast(err);
+        }
+      } catch {
+        // ignore transient poll failure
+      }
+    }, 1500);
+    return () => window.clearInterval(t);
+  }, [downloadingModelId, refreshModelsAndVoices, setErrorToast]);
+
+  const handleDownloadModel = async (modelId: string) => {
+    setDownloadingModelId(modelId);
+    setStatusMsg(`Downloading ${modelId.split("/").pop()} locally (only required once)...`);
+    try {
+      const res = await api.downloadModel(modelId);
+      if (res.status === "completed") {
+        setDownloadingModelId(null);
+        setStatusMsg("Model downloaded and ready locally!");
+        await refreshModelsAndVoices();
+      }
+    } catch (err) {
+      setDownloadingModelId(null);
+      setErrorToast(err instanceof Error ? err.message : String(err));
+    }
+  };
 
   useEffect(() => {
     Promise.all([api.getLabMeta(), api.getLabSamples()])
@@ -243,10 +282,19 @@ export function VoiceLabPage() {
                   </div>
                   {!selectedModel.is_downloaded && (
                     <button
-                      onClick={() => api.downloadModel(selectedModel.model_id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#d4a373] text-[#141210] font-semibold"
+                      disabled={downloadingModelId !== null}
+                      onClick={() => void handleDownloadModel(selectedModel.model_id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#d4a373] text-[#141210] font-semibold disabled:opacity-60 shrink-0"
                     >
-                      <Download className="w-3 h-3" /> Download
+                      {downloadingModelId === selectedModel.model_id ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" /> Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-3 h-3" /> Download ({selectedModel.disk_size_gb} GB)
+                        </>
+                      )}
                     </button>
                   )}
                 </div>

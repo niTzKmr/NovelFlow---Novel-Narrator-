@@ -262,6 +262,11 @@ export const api = {
     );
   },
 
+  getJobStatus: (jobId: string) =>
+    request<{ job_id: string; status: string; total_chunks?: number; completed_chunks?: number; error_message?: string | null }>(
+      `/api/tts/jobs/${encodeURIComponent(jobId)}`
+    ),
+
   cancelJob: (jobId: string) =>
     request<Record<string, unknown>>(`/api/tts/jobs/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),
 
